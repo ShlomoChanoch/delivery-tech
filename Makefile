@@ -32,8 +32,13 @@ IMAGE_TAG    := dev
 PORT         := 8080
 
 .DEFAULT_GOAL := help
-.PHONY: help check-wrapper run lint format test coverage package build scan \
-        up down logs clean validate-tests deploy-local ci-local
+.PHONY: help \
+        check-wrapper check-engine check-compose check-trivy \
+        run \
+        lint format test coverage \
+        package build scan up down logs clean \
+        validate-tests deploy-local \
+        ci-local
 
 # ------------------------------------------------------------------------------
 #  Ajuda
@@ -82,11 +87,14 @@ coverage: ## Abre o relatório de cobertura gerado por 'make test'
 package: check-wrapper ## Gera o .jar em target/ (sem rodar testes de novo)
 	$(MVN) -DskipTests package
 
-build: package ## Build da imagem com Podman/Docker
+build: package check-engine ## Build da imagem com Podman/Docker
 	@test -n "$(ENGINE)" || { echo "Erro: nenhum engine de container encontrado. Instale Podman ou Docker."; exit 1; }
 	$(ENGINE) build -t $(IMAGE_NAME):$(IMAGE_TAG) .
 
-scan: check-engine ## Trivy (config + vulnerabilidades + segredos); usa .trivyignore se existir
+check-trivy:
+	@command -v trivy >/dev/null || { echo "Erro: Trivy não encontrado. Instale em https://trivy.dev"; exit 1; }
+
+scan: check-engine check-trivy ## Trivy (config + vulnerabilidades + segredos); usa .trivyignore se existir
 	trivy config --exit-code 1 --severity MEDIUM,HIGH,CRITICAL .
 	trivy image --exit-code 1 --scanners vuln,secret \
 		--severity LOW,MEDIUM,HIGH,CRITICAL $(IMAGE_NAME):$(IMAGE_TAG)
