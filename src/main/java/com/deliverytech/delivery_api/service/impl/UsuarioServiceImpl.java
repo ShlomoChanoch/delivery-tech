@@ -6,9 +6,10 @@ import com.deliverytech.delivery_api.dto.response.LoginResponse;
 import com.deliverytech.delivery_api.model.Role;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
-import com.deliverytech.delivery_api.service.UsuarioService;
 import com.deliverytech.delivery_api.security.JwtUtil;
-
+import com.deliverytech.delivery_api.service.UsuarioService;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,9 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {

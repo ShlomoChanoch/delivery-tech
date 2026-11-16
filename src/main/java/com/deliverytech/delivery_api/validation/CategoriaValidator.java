@@ -1,9 +1,8 @@
 package com.deliverytech.delivery_api.validation;
 
-import java.util.Arrays;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import java.util.Arrays;
 
 public class CategoriaValidator implements ConstraintValidator<ValidCategoria, String> {
 

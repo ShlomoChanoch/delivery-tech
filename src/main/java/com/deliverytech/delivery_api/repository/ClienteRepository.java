@@ -1,11 +1,10 @@
 package com.deliverytech.delivery_api.repository;
 
 import com.deliverytech.delivery_api.model.Cliente;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.Optional;
-import java.util.List;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     Optional<Cliente> findByEmail(String email);
@@ -21,35 +20,3 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
                    "LIMIT 10", nativeQuery = true)
     List<Object[]> rankingClientesPorPedidos();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

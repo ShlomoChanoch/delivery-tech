@@ -1,8 +1,8 @@
 package com.deliverytech.delivery_api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
+import lombok.*;
 
 @Entity
 @Table(name = "item_pedido")

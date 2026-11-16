@@ -2,9 +2,8 @@ package com.deliverytech.delivery_api.dto.request;
 
 import com.deliverytech.delivery_api.model.Endereco;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

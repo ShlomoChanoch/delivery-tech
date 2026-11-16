@@ -1,15 +1,12 @@
 package com.deliverytech.delivery_api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import com.deliverytech.delivery_api.model.Role;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "usuario")

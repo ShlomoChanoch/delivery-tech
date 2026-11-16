@@ -7,10 +7,10 @@ import com.deliverytech.delivery_api.dto.response.UserResponse;
 import com.deliverytech.delivery_api.model.Usuario;
 
 public interface AuthService {
-    
-    LoginResponse login(LoginRequest request);
 
-    Usuario register(RegisterRequest request);
+  LoginResponse login(LoginRequest request);
 
-    UserResponse getCurrentUser();
+  Usuario register(RegisterRequest request);
+
+  UserResponse getCurrentUser();
 }

@@ -1,9 +1,8 @@
 package com.deliverytech.delivery_api.dto.request;
 
 import jakarta.validation.constraints.*;
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

@@ -11,20 +11,18 @@ import com.deliverytech.delivery_api.service.ClienteService;
 import com.deliverytech.delivery_api.service.PedidoService;
 import com.deliverytech.delivery_api.service.ProdutoService;
 import com.deliverytech.delivery_api.service.RestauranteService;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
-
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.Arrays;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
-import java.time.LocalDate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pedidos")

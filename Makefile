@@ -1,0 +1,118 @@
+# ==============================================================================
+#  Como usar o Makefile
+# ==============================================================================
+#
+#  Uso rápido:
+#    make run        →  Inicia a API Spring Boot (porta 8080)
+#    make test       →  Roda os testes (gera cobertura JaCoCo em target/site/)
+#    make ci-local   →  Roda todas as verificações antes de todo git push
+#    make help       →  Lista todos os comandos disponíveis
+#
+#  Requisitos: JDK 21+ instalado. O Maven NÃO precisa estar instalado:
+#  usamos o wrapper (./mvnw), que baixa a versão fixada no projeto.
+#
+#  Engine de container: usa Podman se instalado; caso contrário, Docker.
+#
+#  URLs úteis da API:
+#    http://localhost:8080/actuator/health
+#    http://localhost:8080/swagger-ui.html
+#    http://localhost:8080/h2-console
+#    http://localhost:8083  →  Adminer (após make up)
+#
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+#  Configuração
+# ------------------------------------------------------------------------------
+ENGINE       ?= $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
+COMPOSE      ?= $(ENGINE) compose
+MVN          := ./mvnw -B -ntp
+IMAGE_NAME   := delivery-api
+IMAGE_TAG    := dev
+PORT         := 8080
+
+.DEFAULT_GOAL := help
+.PHONY: help check-wrapper run lint format test coverage package build scan \
+        up down logs clean validate-tests deploy-local ci-local
+
+# ------------------------------------------------------------------------------
+#  Ajuda
+# ------------------------------------------------------------------------------
+help: ## Mostra esta lista de comandos
+	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
+
+check-wrapper:
+	@test -f ./mvnw || { echo "Erro: ./mvnw não encontrado. Gere o projeto pelo Spring Initializr ou rode 'mvn wrapper:wrapper'."; exit 1; }
+	@test -x ./mvnw || chmod +x ./mvnw
+	@command -v java >/dev/null || { echo "Erro: JDK não encontrado. Instale o Java 21 ou superior."; exit 1; }
+
+check-engine:
+	@test -n "$(ENGINE)" || { echo "Erro: nenhum engine de container encontrado. Instale Podman ou Docker."; exit 1; }
+
+check-compose: check-engine
+	@$(COMPOSE) version >/dev/null 2>&1 || { echo "Erro: 'make up/down/logs' precisa de 'docker compose' (ou 'podman compose') funcionando."; exit 1; }
+
+# ------------------------------------------------------------------------------
+#  1. Execução de código
+# ------------------------------------------------------------------------------
+run: check-wrapper ## Inicia a API Spring Boot (porta 8080)
+	$(MVN) spring-boot:run -Dspring-boot.run.arguments=--server.port=$(PORT)
+
+# ------------------------------------------------------------------------------
+#  2. Qualidade de código
+#     lint/format usam o plugin Spotless (google-java-format) do pom.xml
+# ------------------------------------------------------------------------------
+lint: check-wrapper ## Checagem de formatação (Spotless)
+	$(MVN) spotless:check
+
+format: check-wrapper ## Corrige a formatação automaticamente (Spotless)
+	$(MVN) spotless:apply
+
+test: check-wrapper ## Testes (mvn verify) + cobertura JaCoCo
+	$(MVN) verify
+
+coverage: ## Abre o relatório de cobertura gerado por 'make test'
+	@test -f target/site/jacoco/index.html || { echo "Erro: rode 'make test' antes (relatório ainda não existe)."; exit 1; }
+	@echo "Relatório de cobertura: target/site/jacoco/index.html"
+
+# ------------------------------------------------------------------------------
+#  3. Container
+# ------------------------------------------------------------------------------
+package: check-wrapper ## Gera o .jar em target/ (sem rodar testes de novo)
+	$(MVN) -DskipTests package
+
+build: package ## Build da imagem com Podman/Docker
+	@test -n "$(ENGINE)" || { echo "Erro: nenhum engine de container encontrado. Instale Podman ou Docker."; exit 1; }
+	$(ENGINE) build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+
+scan: check-engine ## Trivy (config + vulnerabilidades + segredos); usa .trivyignore se existir
+	trivy config --exit-code 1 --severity MEDIUM,HIGH,CRITICAL .
+	trivy image --exit-code 1 --scanners vuln,secret \
+		--severity LOW,MEDIUM,HIGH,CRITICAL $(IMAGE_NAME):$(IMAGE_TAG)
+
+up: check-compose ## Sobe a stack (API + Adminer) via docker-compose.yml
+	$(COMPOSE) up -d --build
+
+down: check-compose ## Para e remove os containers (volumes são preservados)
+	$(COMPOSE) down
+
+logs: check-compose ## Fica vendo os logs da API (Ctrl+C sai sem parar a API)
+	$(COMPOSE) logs -f delivery-api
+
+clean: check-wrapper ## Remove os artefatos de build (target/)
+	$(MVN) clean
+
+# ------------------------------------------------------------------------------
+#  4. Scripts auxiliares do projeto (scripts/)
+# ------------------------------------------------------------------------------
+validate-tests: check-wrapper ## Roda scripts/validate-tests.sh (salva test_results.log)
+	bash scripts/validate-tests.sh
+
+deploy-local: check-engine ## Roda scripts/deploy-local.sh (deploy com Docker local)
+	bash scripts/deploy-local.sh
+
+# ------------------------------------------------------------------------------
+#  5. Pipeline local
+# ------------------------------------------------------------------------------
+ci-local: lint test build scan ## Roda todas as verificações antes do push

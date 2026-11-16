@@ -1,5 +1,18 @@
 package com.deliverytech.delivery_api.controller;
 
+import com.deliverytech.delivery_api.dto.request.LoginRequest;
+import com.deliverytech.delivery_api.dto.request.RegisterRequest;
+import com.deliverytech.delivery_api.dto.response.LoginResponse;
+import com.deliverytech.delivery_api.dto.response.UserResponse;
+import com.deliverytech.delivery_api.model.Usuario;
+import com.deliverytech.delivery_api.security.JwtUtil;
+import com.deliverytech.delivery_api.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,21 +22,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import com.deliverytech.delivery_api.dto.request.LoginRequest;
-import com.deliverytech.delivery_api.dto.request.RegisterRequest;
-import com.deliverytech.delivery_api.dto.response.LoginResponse;
-import com.deliverytech.delivery_api.dto.response.UserResponse;
-import com.deliverytech.delivery_api.model.Usuario;
-import com.deliverytech.delivery_api.security.JwtUtil;
-import com.deliverytech.delivery_api.service.UsuarioService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/auth")

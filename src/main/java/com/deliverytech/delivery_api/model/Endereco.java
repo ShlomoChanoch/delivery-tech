@@ -1,8 +1,8 @@
 package com.deliverytech.delivery_api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Embeddable
 @Data

@@ -1,45 +1,34 @@
-//mudança 16/07
+// mudança 16/07
 package com.deliverytech.delivery_api.service;
 
 import com.deliverytech.delivery_api.dto.request.ClienteRequest;
 import com.deliverytech.delivery_api.model.Cliente;
-
-
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Interface de serviços para gerenciamento de clientes
- */
-
+/** Interface de serviços para gerenciamento de clientes */
 public interface ClienteService {
 
-  
-    Cliente cadastrar(ClienteRequest clienteRequest);
-    
-    Optional<Cliente> buscarPorId(Long id);
-    
+  Cliente cadastrar(ClienteRequest clienteRequest);
 
-    Optional<Cliente> buscarPorEmail(String email);
-    
+  Optional<Cliente> buscarPorId(Long id);
 
-    List<Cliente> listarAtivos();
-    
+  Optional<Cliente> buscarPorEmail(String email);
 
-    List<Cliente> buscarPorNome(String nome);
-    
+  List<Cliente> listarAtivos();
 
-    Cliente atualizar(Long id, ClienteRequest clienteRequest);
-    
+  List<Cliente> buscarPorNome(String nome);
 
-    void inativar(Long id);
+  Cliente atualizar(Long id, ClienteRequest clienteRequest);
 
-    // ADICIONAR APENAS ESTE MÉTODO (para atender atividade)
-    /**
-     * Ativar/Desativar cliente (toggle status ativo)
-     * @param id ID do cliente
-     * @return cliente com status alterado
-     */
-    Cliente ativarDesativarCliente(Long id);
+  void inativar(Long id);
 
+  // ADICIONAR APENAS ESTE MÉTODO (para atender atividade)
+  /**
+   * Ativar/Desativar cliente (toggle status ativo)
+   *
+   * @param id ID do cliente
+   * @return cliente com status alterado
+   */
+  Cliente ativarDesativarCliente(Long id);
 }

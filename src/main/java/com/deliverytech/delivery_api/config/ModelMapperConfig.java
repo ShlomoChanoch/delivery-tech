@@ -1,12 +1,11 @@
 package com.deliverytech.delivery_api.config;
 
+import com.deliverytech.delivery_api.dto.response.PedidoResponse;
+import com.deliverytech.delivery_api.model.Pedido;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.deliverytech.delivery_api.dto.response.PedidoResponse;
-import com.deliverytech.delivery_api.model.Pedido;
 
 @Configuration
 public class ModelMapperConfig {

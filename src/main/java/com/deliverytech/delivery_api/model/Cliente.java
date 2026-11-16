@@ -1,10 +1,9 @@
 package com.deliverytech.delivery_api.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import lombok.*;
 
 
 @Entity

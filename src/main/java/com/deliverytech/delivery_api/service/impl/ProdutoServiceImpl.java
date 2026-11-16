@@ -3,14 +3,13 @@ package com.deliverytech.delivery_api.service.impl;
 import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.ProdutoService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j; //ADICIONAR ESTE IMPORT
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j // ADICIONAR ESTA ANOTAÇÃO
 @Service

@@ -1,11 +1,5 @@
 package com.deliverytech.delivery_api.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
 import com.deliverytech.delivery_api.dto.request.LoginRequest;
 import com.deliverytech.delivery_api.dto.request.RegisterRequest;
 import com.deliverytech.delivery_api.dto.response.LoginResponse;
@@ -13,8 +7,11 @@ import com.deliverytech.delivery_api.dto.response.UserResponse;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
 import com.deliverytech.delivery_api.service.AuthService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service

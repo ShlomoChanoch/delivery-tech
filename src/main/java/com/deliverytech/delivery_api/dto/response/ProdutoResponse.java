@@ -1,8 +1,7 @@
 package com.deliverytech.delivery_api.dto.response;
 
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.*;
 
 @Data
 @NoArgsConstructor

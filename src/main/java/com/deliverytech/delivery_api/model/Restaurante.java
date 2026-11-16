@@ -2,10 +2,9 @@ package com.deliverytech.delivery_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.util.List;
+import lombok.*;
 
 @Entity
 @Data

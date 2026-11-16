@@ -1,7 +1,7 @@
 package com.deliverytech.delivery_api.dto.response;
 
-import lombok.*;
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
