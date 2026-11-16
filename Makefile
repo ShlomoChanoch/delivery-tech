@@ -4,6 +4,7 @@
 #
 #  Uso rápido:
 #    make run        →  Inicia a API Spring Boot (porta 8080)
+#    make dev        →  Sobe a stack (API + Adminer) e mostra as URLs
 #    make test       →  Roda os testes (gera cobertura JaCoCo em target/site/)
 #    make ci-local   →  Roda todas as verificações antes de todo git push
 #    make help       →  Lista todos os comandos disponíveis
@@ -13,11 +14,12 @@
 #
 #  Engine de container: usa Podman se instalado; caso contrário, Docker.
 #
-#  URLs úteis da API:
+#  URLs úteis da API (após 'make dev'):
+#    http://localhost:8080/swagger-ui/index.html
+#    http://localhost:8080/api-docs
 #    http://localhost:8080/actuator/health
-#    http://localhost:8080/swagger-ui.html
 #    http://localhost:8080/h2-console
-#    http://localhost:8083  →  Adminer (após make up)
+#    http://localhost:8083  →  Adminer
 #
 # ==============================================================================
 
@@ -36,7 +38,7 @@ PORT         := 8080
         check-wrapper check-engine check-compose check-trivy \
         run \
         lint format test coverage \
-        package build scan up down logs clean \
+        package build scan up dev down logs clean \
         validate-tests deploy-local \
         ci-local
 
@@ -101,6 +103,32 @@ scan: check-engine check-trivy ## Trivy (config + vulnerabilidades + segredos); 
 
 up: check-compose ## Sobe a stack (API + Adminer) via docker-compose.yml
 	$(COMPOSE) up -d --build
+
+dev: up ## Sobe a stack, espera a API ficar pronta e mostra as URLs
+	@echo ""
+	@echo "⏳ Aguardando API responder em http://localhost:$(PORT)..."
+	@for i in $$(seq 1 30); do \
+		code=$$(curl -s -o /dev/null -w "%{http_code}" http://localhost:$(PORT)/actuator/health 2>/dev/null); \
+		if [ "$$code" = "200" ]; then \
+			echo "✅ API pronta!"; \
+			break; \
+		fi; \
+		[ $$i -eq 30 ] && { echo "❌ API não respondeu em 60s. Verifique: make logs"; exit 1; }; \
+		sleep 2; \
+	done
+	@echo ""
+	@echo "┌───────────────────────────────────────────────────────────────┐"
+	@echo "│  🚀 URLs disponíveis                                         │"
+	@echo "├───────────────────────────────────────────────────────────────┤"
+	@printf "│  %-59s │\n" "Swagger UI   → http://localhost:$(PORT)/swagger-ui/index.html"
+	@printf "│  %-59s │\n" "API Docs     → http://localhost:$(PORT)/api-docs"
+	@printf "│  %-59s │\n" "Health       → http://localhost:$(PORT)/actuator/health"
+	@printf "│  %-59s │\n" "H2 Console   → http://localhost:$(PORT)/h2-console"
+	@printf "│  %-59s │\n" "Adminer      → http://localhost:8083"
+	@echo "└───────────────────────────────────────────────────────────────┘"
+	@echo ""
+	@echo "📋 Para ver os logs:  make logs"
+	@echo "🛑 Para parar:        make down"
 
 down: check-compose ## Para e remove os containers (volumes são preservados)
 	$(COMPOSE) down
