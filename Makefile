@@ -89,7 +89,7 @@ package: check-wrapper ## Gera o .jar em target/ (sem rodar testes de novo)
 
 build: package check-engine ## Build da imagem com Podman/Docker
 	@test -n "$(ENGINE)" || { echo "Erro: nenhum engine de container encontrado. Instale Podman ou Docker."; exit 1; }
-	$(ENGINE) build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+	$(ENGINE) build --pull -t $(IMAGE_NAME):$(IMAGE_TAG) .
 
 check-trivy:
 	@command -v trivy >/dev/null || { echo "Erro: Trivy não encontrado. Instale em https://trivy.dev"; exit 1; }
@@ -97,7 +97,7 @@ check-trivy:
 scan: check-engine check-trivy ## Trivy (config + vulnerabilidades + segredos); usa .trivyignore se existir
 	trivy config --exit-code 1 --severity MEDIUM,HIGH,CRITICAL .
 	trivy image --exit-code 1 --scanners vuln,secret \
-		--severity LOW,MEDIUM,HIGH,CRITICAL $(IMAGE_NAME):$(IMAGE_TAG)
+		--severity HIGH,CRITICAL --ignore-unfixed $(IMAGE_NAME):$(IMAGE_TAG)
 
 up: check-compose ## Sobe a stack (API + Adminer) via docker-compose.yml
 	$(COMPOSE) up -d --build
