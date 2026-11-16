@@ -153,35 +153,35 @@ class PedidoControllerIT {
     }
 
     @Test
-    @DisplayName("POST /api/pedidos - Deve retornar 400 com cliente inexistente")
+    @DisplayName("POST /api/pedidos - Deve retornar 404 com cliente inexistente")
     @WithMockUser
-    void testCriarPedido_ClienteInexistente_DeveRetornar400() throws Exception {
+    void testCriarPedido_ClienteInexistente_DeveRetornar404() throws Exception {
         // Given
         pedidoRequest.setClienteId(999L); // ID inexistente
 
-        // When & Then
+        // When & Then - hoje a API responde 404 (handler de "não encontrado")
         mockMvc.perform(
                         post("/api/pedidos")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(pedidoRequest)))
-                .andExpect(status().isInternalServerError()); // ✅ Controller lança RuntimeException
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("POST /api/pedidos - Deve retornar 400 com restaurante inexistente")
+    @DisplayName("POST /api/pedidos - Deve retornar 404 com restaurante inexistente")
     @WithMockUser
-    void testCriarPedido_RestauranteInexistente_DeveRetornar400() throws Exception {
+    void testCriarPedido_RestauranteInexistente_DeveRetornar404() throws Exception {
         // Given
         pedidoRequest.setRestauranteId(999L); // ID inexistente
 
-        // When & Then
+        // When & Then - hoje a API responde 404 (handler de "não encontrado")
         mockMvc.perform(
                         post("/api/pedidos")
                                 .with(csrf())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(pedidoRequest)))
-                .andExpect(status().isInternalServerError()); // ✅ Controller lança RuntimeException
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -221,10 +221,10 @@ class PedidoControllerIT {
     @Test
     @DisplayName("GET /api/pedidos/{id} - Deve retornar 404 para pedido inexistente")
     @WithMockUser
-    void testBuscarPedidoPorId_PedidoInexistente_DeveRetornar500() throws Exception {
-        // When & Then - Controller lança RuntimeException para não encontrado
+    void testBuscarPedidoPorId_PedidoInexistente_DeveRetornar404() throws Exception {
+        // When & Then - handler mapeia "não encontrado" para 404
         mockMvc.perform(get("/api/pedidos/{id}", 999L).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
