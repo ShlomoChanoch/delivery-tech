@@ -5,7 +5,7 @@
  <parent>
   <groupId>org.springframework.boot</groupId>
   <artifactId>spring-boot-starter-parent</artifactId>
-  <version>3.5.3</version>
+  <version>3.5.14</version>
   <relativePath/>
  </parent>
  <groupId>com.deliverytech</groupId>
@@ -28,6 +28,17 @@
  </scm>
  <properties>
   <java.version>21</java.version>
+
+  <!-- Seguranca: versoes corrigidas apontadas pelo Trivy (make scan).
+       Sobrescrevem as gerenciadas pelo spring-boot-starter-parent.
+       Ao subir o parent no futuro, rode o scan sem estas linhas e
+       remova as que nao forem mais necessarias. -->
+  <tomcat.version>10.1.59</tomcat.version>
+  <spring-framework.version>6.2.19</spring-framework.version>
+  <spring-security.version>6.5.9</spring-security.version>
+  <spring-data-bom.version>2025.0.12</spring-data-bom.version>
+  <micrometer.version>1.15.12</micrometer.version>
+  <jackson-bom.version>2.21.7</jackson-bom.version>
  </properties>
  
  <dependencies>

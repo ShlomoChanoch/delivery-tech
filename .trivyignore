@@ -1,0 +1,5 @@
+# Spring Framework (spring-webmvc 6.2.19): correção só existe na linha 7.0.x (Spring Boot 4).
+# - CVE-2026-47884: RCE via XsltView  -> a API não usa XsltView (REST/JSON).
+# - CVE-2026-47890: corrupção de stream SSE com views -> a API não usa SSE.
+CVE-2026-47884
+CVE-2026-47890
