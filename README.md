@@ -1,6 +1,8 @@
 # 🚀 Delivery API
 
-API backend desenvolvida em **Java 21** com **Spring Boot 3.2.x**, como base para um sistema de delivery moderno, escalável e de fácil manutenção.
+API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção.
+
+> **Status atual:** ✅ `make test` verde (60 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado.
 
 ---
 
@@ -8,28 +10,39 @@ API backend desenvolvida em **Java 21** com **Spring Boot 3.2.x**, como base par
 
 Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplicações de delivery, servindo como ponto de partida para funcionalidades como:
 
-- Cadastro e gerenciamento de usuários e restaurantes
-- Catálogo de produtos
-- Gestão de pedidos
-- Integração com meios de pagamento
-- Monitoramento e métricas via Actuator
+- Cadastro e gerenciamento de usuários, clientes, restaurantes e produtos
+- Catálogo de produtos com busca, categoria e disponibilidade
+- Gestão de pedidos (criação, itens, confirmação, cancelamento e transição de status)
+- Relatórios de vendas, produtos mais vendidos e clientes ativos
+- Autenticação JWT e documentação OpenAPI/Swagger
+- Monitoramento e métricas via Actuator/Prometheus
 
 ---
 
 ## 🛠️ Tecnologias e Ferramentas
 
-- **Java 21** – última versão LTS, com melhorias de performance e segurança  
-- **Spring Boot 3.2.x** – criação de APIs REST com configuração mínima  
-- **Maven** – gerenciamento de dependências e ciclo de build  
-- **H2 Database** – banco de dados em memória para testes e desenvolvimento rápido  
-- **Spring DevTools** – para recarga automática durante o desenvolvimento
+- **Java 21** – LTS  
+- **Spring Boot 3.5.14** – API REST; versões fixadas no `pom.xml` para correção de CVEs: Spring Framework **6.2.19**, Spring Security **6.5.9**, Tomcat **10.1.59**, Jackson **2.21.7**  
+- **Spring Security + JWT** – autenticação stateless (BCrypt, filtro `JwtAuthenticationFilter`)  
+- **Spring Data JPA + H2** – banco em memória para dev/teste (driver MySQL 8.4 incluído no `pom.xml`)  
+- **Caffeine** – cache  
+- **SpringDoc OpenAPI** – Swagger UI em `/swagger-ui.html`  
+- **Lombok 1.18.48**, **ModelMapper** e **Bean Validation**  
+- **Maven** com wrapper (`./mvnw`)  
+- **Spotless** (google-java-format, estilo AOSP) – formatação e checagem de código  
+- **JaCoCo** – cobertura de testes  
+- **Failsafe** – testes de integração executados no `mvn verify`  
+- **Docker** – build multi-stage com imagem final **distroless** (sem shell, usuário `nonroot`) + `docker-compose` com Adminer  
+- **Trivy** – scan de config, vulnerabilidades e segredos  
+- **GitHub Actions** – pipeline de CI/CD  
+- **Make** – atalhos para build, testes, lint e scan  
 
 ---
 
 ## 📈 Status do Projeto
 
-✅ **Funcional**  
-> Aplicação rodando com sucesso, DataLoader carregando dados de teste e H2 Console ativo.
+✅ **Funcional e verificado**  
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (36 unitários + 24 de integração).
 
 ---
 
@@ -42,11 +55,70 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 - [x] DataLoader para carga de dados de teste
 - [x] H2 Console configurado e funcionando
 - [x] Consultas SQL customizadas implementadas
+- [x] DTOs de request/response e validação com Bean Validation
+- [x] Tratamento global de exceções via `@RestControllerAdvice`
+- [x] CRUD completo de clientes, restaurantes, produtos e pedidos — **50 endpoints**
+- [x] Fluxo de pedidos: criação, itens, confirmação, cancelamento e transição de status
+- [x] Autenticação JWT (`POST /api/auth/login` e `/register`) e autorização por filtro
+- [x] Documentação OpenAPI/Swagger configurada
+- [x] Filtro de captura de requisições/respostas em `entregaveis/`
+- [x] Testes unitários e de integração (Surefire + Failsafe)
+- [x] Formatação automática (Spotless) e cobertura (JaCoCo)
+- [x] Build Docker multi-stage com imagem distroless + `docker-compose`
+- [x] Pipeline de CI/CD no GitHub Actions
+- [x] Scan de segurança com Trivy (`make scan`)
 
 ---
 
-# 📋 Guia de Alterações Recentes
+# 🔧 Ciclo Recente: Qualidade, Segurança e Testes
+
+**Últimos 15 commits** (`0e22e5a` → `99cc720`), agrupados por tema. O objetivo do ciclo foi blindar o build, a suíte de testes e a superfície de segurança da API.
+
+### 1️⃣ Padronização de código — Spotless
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `0e22e5a` | `style: aplica google-java-format via Spotless` | Formata todo o código no estilo AOSP |
+| `1e88be0` | `style: aplica google-java-format via Spotless` | Segunda passada de formatação |
+| `750bf9b` | `build: configura Spotless e silencia warnings do Maven` | Plugin no `pom.xml` + alvos `make lint` / `make format` |
+| `25655ca` | `chore: ajusta Makefile (.PHONY, check-trivy)` | Corrige alvos fantasma e cria o pre-requisito do scan |
+
+### 2️⃣ Toolchain e build
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `b61fd8d` | `build: atualiza Lombok para 1.18.48 e habilita annotation processing (JDK 23+)` | `lombok 1.18.48` + `<proc>full</proc>` no compilador |
+| `4e69657` | `build: habilita Failsafe para testes de integração` | `*IT.java` rodam no `mvn verify` (alvo `make test`) |
+| `14168b6` | `fix: removendo :--sun-misc-unsafe-memory-access=allow` | Remove a flag de JVM `--sun-misc-unsafe-memory-access=allow` que quebrava o build |
+| `270e421` | `build: remove jvm.config com flags exclusivas de JDK 23+` | O projeto roda em **JDK 21** (CI e Docker); as flags só existem no 23+ |
+
+### 3️⃣ Testes de integração
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `fe0e389` | `test: corrige 3 ITs que retornavam 500` | ITs alinhados ao comportamento real da API |
+| `49afa56` | `test: alinha ITs de Pedido ao 404 para entidades inexistentes (Grupo A)` | Contrato de erro padronizado |
+| `c7f0699` | `test: corrige JSON paths nos ITs de Cliente (Grupo B)` | Asserções corrigidas nos caminhos do JSON |
+
+### 4️⃣ Segurança e dependências
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `5878daa` | `fix(deps): atualiza Spring Boot para 3.5.14 e corrige CVEs` | Boot **3.2.x → 3.5.14** + fixos de Spring Framework 6.2.19, Spring Security 6.5.9 e Tomcat 10.1.59 |
+| `44fec26` | `build(docker): troca imagem base para distroless Debian 13` | Runtime sem shell e usuário `nonroot` |
+| `2a39608` | `ci(make): adiciona alvo scan com Trivy` | `make scan` (config + vulnerabilidades + segredos) e `.trivyignore` |
+
+### 5️⃣ Refatoração
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `99cc720` | `refactor: resolve avisos do SonarLint/LSP e corrige stubs de login` | Injeção via construtor, `System.out` → logger, `@Builder.Default`, APIs deprecated, `@MockBean` → `@MockitoBean` e remoção de stubs que lançavam `UnsupportedOperationException` |
+
+**Resultado do ciclo:** `make lint` ✅ · `make test` ✅ (60 testes, 0 falhas) · `make scan` disponível para auditoria de segurança
+
+> **Nota sobre CVEs ignoradas:** o `.trivyignore` contém `CVE-2026-47884` (RCE via `XsltView`) e `CVE-2026-47890` (stream SSE com views). A correção só existe na linha 7.0.x (Spring Boot 4), e **esta API não usa XSLT nem SSE** — é REST/JSON puro —, portanto o risco não se aplica. A justificativa está documentada no próprio arquivo.
+
+---
+
+# 📋 Guia de Alterações (histórico — julho/2025)
 **Período: Sábado Meia-noite até Segunda-feira 14/07/2025**
+
+> ⚠️ Documento histórico mantido para referência. As versões, consultas e dados citados abaixo podem estar desatualizados — veja as seções acima para o estado atual do projeto.
 
 ## 📌 **RESUMO EXECUTIVO**
 Este guia documenta todas as alterações realizadas no projeto `delivery-tech` para corrigir erros de compilação, adicionar consultas customizadas e garantir o funcionamento correto da aplicação.
@@ -269,54 +341,111 @@ Existe cliente com email: true
 
 ## 🗂️ Próximas Etapas
 
-- [ ] Adicionar campos `telefone` e `endereco` nas classes `Cliente` e `Restaurante` se necessário
-- [ ] Criar controllers para expor as consultas customizadas via REST API
-- [ ] Implementar testes unitários para os repositories
-- [ ] Adicionar validações nos modelos
-- [ ] Configurar Swagger/OpenAPI para documentação da API
+- [x] Adicionar campos `telefone` e `endereco` nas classes `Cliente` e `Restaurante`
+- [x] Criar controllers para expor as consultas customizadas via REST API (`RelatorioController`)
+- [x] Adicionar validações nos modelos (Bean Validation)
+- [x] Configurar Swagger/OpenAPI para documentação da API
+- [x] Implementar testes unitários e de integração (60 testes)
+- [ ] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
+- [ ] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação
+- [ ] Trocar o H2 em memória por MySQL em homologação/produção
+- [ ] Mover `jwt.secret` para variável de ambiente (hoje está hardcoded no `application.properties`)
+- [ ] Implementar `AuthService` (`login`, `register` e `getCurrentUser` ainda lançam `UnsupportedOperationException`)
+- [ ] Implementar `RelatorioServiceImpl` com dados reais (hoje retorna valores fixos)
+- [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
 
 ---
 
 ## 📁 Estrutura do Projeto
 ```
 delivery-tech/
+├── .github/workflows/ci-cd.yml      # CI/CD: testes, build do jar, imagem Docker, deploy simulado
+├── .trivyignore                     # CVEs justificadas (não aplicáveis a esta API)
+├── Dockerfile                       # multi-stage: Maven/JDK 21 → distroless (nonroot)
+├── docker-compose.yml               # API (:8080) + Adminer (:8083)
+├── Makefile                         # atalhos: run, lint, format, test, scan, up...
+├── pom.xml
+├── scripts/                         # validate-tests.sh, deploy-local.sh, test-docker.sh
 ├── src/main/java/com/deliverytech/delivery_api/
-│   ├── config/
-│   │   └── DataLoader.java
-│   ├── model/
-│   │   ├── Cliente.java
-│   │   ├── Restaurante.java
-│   │   ├── Produto.java
-│   │   ├── Pedido.java
-│   │   └── StatusPedido.java
-│   ├── repository/
-│   │   ├── ClienteRepository.java
-│   │   ├── RestauranteRepository.java
-│   │   ├── ProdutoRepository.java
-│   │   ├── PedidoRepository.java
-│   │   └── RelatorioVendas.java
+│   ├── config/                      # SecurityConfig, DataLoader, FilterConfig,
+│   │                                # ResponseCaptureFilter, OpenApiConfig, ModelMapperConfig
+│   ├── controller/                  # Auth, Cliente, Restaurante, Produto, Pedido,
+│   │                                # Relatorio e Health — 50 endpoints
+│   ├── dto/                         # request/ e response/
+│   ├── exception/                   # GlobalExceptionHandler
+│   ├── health/                      # Health indicators customizados
+│   ├── model/                       # Cliente, Restaurante, Produto, Pedido, StatusPedido...
+│   ├── projection/                  # projeções de relatório
+│   ├── repository/                  # Spring Data JPA + @Query nativas
+│   ├── security/                    # JwtUtil, JwtAuthenticationFilter, SecurityUtils
+│   ├── service/                     # interfaces + impl/
+│   ├── validation/                  # validadores (ex.: CEP)
 │   └── DeliveryApiApplication.java
 ├── src/main/resources/
 │   └── application.properties
-└── pom.xml
+└── src/test/java/                   # 4 classes *Test (unit) + 2 *IT (integração)
 ```
 
 ---
 
 ## 🚀 Como Executar
 
-1. **Clone o repositório**
-2. **Execute a aplicação:**
+1. **Clone o repositório** (requisitos: **JDK 21** e Maven — o wrapper `./mvnw` é incluído)
+
+2. **Rode a aplicação:**
    ```bash
-   mvn spring-boot:run
+   make run          # ou: ./mvnw spring-boot:run
    ```
+   A API sobe em `http://localhost:8080`.
+
 3. **Acesse o H2 Console:**
    - URL: `http://localhost:8080/h2-console`
    - JDBC URL: `jdbc:h2:mem:delivery`
    - Username: `sa`
    - Password: (deixar em branco)
 
+4. **Documentação da API:**
+   - Swagger UI: `http://localhost:8080/swagger-ui.html`
+   - OpenAPI: `http://localhost:8080/api-docs`
+   - Health: `http://localhost:8080/actuator/health`
+
+> **Autenticação:** `/api/auth/**`, `/health`, `/info`, `/actuator/**` e o Swagger são públicos. Todos os demais endpoints exigem token JWT — faça login em `POST /api/auth/login` e envie o cabeçalho `Authorization: Bearer <token>`.
+
+### 🧰 Comandos úteis (Makefile)
+
+| Comando | Descrição |
+|---|---|
+| `make run` | Sobe a API na porta 8080 |
+| `make lint` | Checagem de formatação (Spotless) |
+| `make format` | Corrige a formatação automaticamente |
+| `make test` | Testes (`mvn verify`) + cobertura JaCoCo |
+| `make coverage` | Abre o relatório de cobertura |
+| `make package` | Gera o `.jar` em `target/` (sem rodar testes de novo) |
+| `make build` | Build da imagem Docker/Podman |
+| `make scan` | Trivy: config + vulnerabilidades + segredos |
+| `make up` / `make down` / `make logs` | Sobe, dura e acompanha a stack (API + Adminer) |
+| `make ci-local` | `lint` + `test` + `build` + `scan` antes do push |
+
+### 🐳 Docker
+
+```bash
+make up      # API em http://localhost:8080 e Adminer em http://localhost:8083
+make down    # para os containers (volumes preservados)
+```
+
+A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-Dspring.profiles.active=docker`.
+
+### 🧪 Testes
+
+```bash
+make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCoCo)
+```
+
+- **36 testes unitários** em 4 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `DeliveryApiApplicationTests`
+- **24 testes de integração** em `ClienteControllerIT` e `PedidoControllerIT` (executados pelo Failsafe no `mvn verify`)
+- Relatório de cobertura: `make coverage`
+
 ---
 
-**🎯 CONCLUSÃO:** Todas as correções foram aplicadas com sucesso e a aplicação está funcionando
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (60 testes verdes), documentado (Swagger) e com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs e `make scan` (Trivy) disponível para auditoria —, com o histórico de alterações preservado acima.
 
