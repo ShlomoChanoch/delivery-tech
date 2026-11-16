@@ -11,15 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginResponse {
 
+    @Schema(description = "Token JWT gerado para o usuário autenticado")
     private String token;
 
-    public void setUsername(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setUsername'");
-    }
+    @Schema(description = "Usuário autenticado")
+    private String username;
 
-    public void setMessage(String string) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setMessage'");
-    }
+    @Schema(description = "Mensagem descritiva do resultado")
+    private String message;
 }

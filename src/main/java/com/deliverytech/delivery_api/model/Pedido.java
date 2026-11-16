@@ -34,7 +34,7 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
-    private LocalDateTime dataPedido = LocalDateTime.now();
+    @Builder.Default private LocalDateTime dataPedido = LocalDateTime.now();
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ItemPedido> itens;

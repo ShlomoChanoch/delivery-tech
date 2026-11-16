@@ -1,6 +1,5 @@
 package com.deliverytech.delivery_api.service.impl;
 
-import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.service.RelatorioService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,8 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RelatorioServiceImpl implements RelatorioService {
-
-    private final PedidoRepository pedidoRepository;
 
     @Override
     public List<Map<String, Object>> relatorioVendasPorRestaurante(

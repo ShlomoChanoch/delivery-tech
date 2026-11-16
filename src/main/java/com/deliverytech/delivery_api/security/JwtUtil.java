@@ -48,9 +48,4 @@ public class JwtUtil {
         Claims claims = validarToken(token);
         return claims != null ? claims.getSubject() : null;
     }
-
-    public String generateToken(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'generateToken'");
-    }
 }

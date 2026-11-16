@@ -10,10 +10,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+@Slf4j
 public class ResponseCaptureFilter implements Filter {
+
+    /** Tamanho máximo (bytes) do corpo de requisição guardado em memória para o log. */
+    private static final int MAX_REQUEST_CACHE_BYTES = 10 * 1024 * 1024;
 
     private final ObjectMapper objectMapper;
 
@@ -36,7 +41,9 @@ public class ResponseCaptureFilter implements Filter {
         }
 
         // ✅ Wrapper para capturar request e response
-        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(httpRequest);
+        // (o construtor sem limite foi descontinuado no Spring 6.2.18 e sai no Spring 7)
+        ContentCachingRequestWrapper requestWrapper =
+                new ContentCachingRequestWrapper(httpRequest, MAX_REQUEST_CACHE_BYTES);
         ContentCachingResponseWrapper responseWrapper =
                 new ContentCachingResponseWrapper(httpResponse);
 
@@ -134,10 +141,10 @@ public class ResponseCaptureFilter implements Filter {
             }
 
             // ✅ Log no console
-            System.out.println("📄 Resposta completa salva: entregaveis/" + fileName);
+            log.info("📄 Resposta completa salva: entregaveis/{}", fileName);
 
         } catch (Exception e) {
-            System.err.println("❌ Erro ao salvar resposta: " + e.getMessage());
+            log.error("❌ Erro ao salvar resposta: {}", e.getMessage());
         }
     }
 }

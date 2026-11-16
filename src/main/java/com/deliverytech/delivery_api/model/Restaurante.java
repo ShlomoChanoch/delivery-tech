@@ -30,7 +30,7 @@ public class Restaurante {
 
     private Integer tempoEntregaMinutos;
 
-    private Boolean ativo = true;
+    @Builder.Default private Boolean ativo = true;
 
     @OneToMany(mappedBy = "restaurante", cascade = CascadeType.ALL)
     private List<Produto> produtos;

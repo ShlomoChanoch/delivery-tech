@@ -4,42 +4,43 @@ import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.*;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
-    @Autowired private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
 
-    @Autowired private RestauranteRepository restauranteRepository;
+    private final RestauranteRepository restauranteRepository;
 
-    @Autowired private ProdutoRepository produtoRepository;
-
-    @Autowired private PedidoRepository pedidoRepository;
+    private final ProdutoRepository produtoRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("=== INICIANDO CARGA DE DADOS DE TESTE ===");
+        log.info("=== INICIANDO CARGA DE DADOS DE TESTE ===");
 
         // Inserir dados de teste (sem limpar dados existentes)
         inserirClientes();
         inserirRestaurantes();
 
-        System.out.println("=== CARGA DE DADOS CONCLUÍDA ===");
+        log.info("=== CARGA DE DADOS CONCLUÍDA ===");
 
         // ✅ ADICIONAR: Spring Boot iniciada com sucesso + Bender
-        System.out.println("\n✅ Spring Boot Application iniciada com sucesso!");
+        log.info("\n✅ Spring Boot Application iniciada com sucesso!");
 
         // ✅ INFORMAR sobre captura automática
-        System.out.println("\n🎯 SISTEMA DE CAPTURA AUTOMÁTICA ATIVO!");
-        System.out.println("📁 Respostas serão salvas em: ./entregaveis/");
-        System.out.println("🔄 Faça requisições para /api/* e veja os arquivos sendo gerados!\n");
+        log.info("\n🎯 SISTEMA DE CAPTURA AUTOMÁTICA ATIVO!");
+        log.info("📁 Respostas serão salvas em: ./entregaveis/");
+        log.info("🔄 Faça requisições para /api/* e veja os arquivos sendo gerados!\n");
     }
 
     private void inserirClientes() {
-        System.out.println("--- Inserindo clientes ---");
+        log.info("--- Inserindo clientes ---");
 
         Cliente cliente1 = new Cliente();
         cliente1.setNome("João Silva");
@@ -77,11 +78,11 @@ public class DataLoader implements CommandLineRunner {
         cliente5.setAtivo(true);
 
         clienteRepository.saveAll(Arrays.asList(cliente1, cliente2, cliente3, cliente4, cliente5));
-        System.out.println("✓ 5 clientes inseridos");
+        log.info("✓ 5 clientes inseridos");
     }
 
     private void inserirRestaurantes() {
-        System.out.println("--- Inserindo Restaurantes ---");
+        log.info("--- Inserindo Restaurantes ---");
 
         Restaurante restaurante1 = new Restaurante();
         restaurante1.setNome("Pizza Express");
@@ -121,14 +122,14 @@ public class DataLoader implements CommandLineRunner {
         restauranteRepository.saveAll(
                 Arrays.asList(
                         restaurante1, restaurante2, restaurante3, restaurante4, restaurante5));
-        System.out.println("✓ 5 restaurantes inseridos");
+        log.info("✓ 5 restaurantes inseridos");
 
         // Inserir produtos após restaurantes para poder associá-los
         inserirProdutos();
     }
 
     private void inserirProdutos() {
-        System.out.println("--- Inserindo Produtos ---");
+        log.info("--- Inserindo Produtos ---");
 
         // Buscar restaurantes para associar aos produtos
         var restaurantes = restauranteRepository.findAll();
@@ -243,6 +244,6 @@ public class DataLoader implements CommandLineRunner {
                 Arrays.asList(
                         produto1, produto2, produto3, produto4, produto5, produto6, produto7,
                         produto8, produto9, produto10));
-        System.out.println("✓ 10 produtos inseridos");
+        log.info("✓ 10 produtos inseridos");
     }
 }

@@ -57,7 +57,7 @@ public class AuthController {
                     jwtUtil.gerarToken(
                             username); // MUDANÇA: usar gerarToken em vez de generateToken
 
-            LoginResponse dto = new LoginResponse(token);
+            LoginResponse dto = new LoginResponse(token, username, "Login realizado com sucesso");
             return ResponseEntity.ok(dto);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -5,6 +5,7 @@ import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
 import com.deliverytech.delivery_api.service.RestauranteService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -158,7 +159,7 @@ public class RestauranteServiceImpl implements RestauranteService {
             }
 
             BigDecimal taxaFinal =
-                    taxaBase.multiply(multiplicador).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    taxaBase.multiply(multiplicador).setScale(2, RoundingMode.HALF_UP);
 
             log.info(
                     "Taxa calculada: R$ {} (base: R$ {}, multiplicador: {})",

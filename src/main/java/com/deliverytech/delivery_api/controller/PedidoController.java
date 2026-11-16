@@ -150,10 +150,9 @@ public class PedidoController {
             @PathVariable Long pedidoId,
             @RequestParam Long produtoId,
             @RequestParam Integer quantidade) {
-        Produto produto =
-                produtoService
-                        .buscarPorId(produtoId)
-                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        produtoService
+                .buscarPorId(produtoId)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
         Pedido pedidoAtualizado = pedidoService.adicionarItem(pedidoId, produtoId, quantidade);
 
