@@ -111,14 +111,14 @@ class ClienteControllerIT {
         // Given
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
-        // When & Then
+        // When & Then - resposta embrulhada em ApiResponseWrapper {success, data, message}
         mockMvc.perform(
                         get("/api/clientes/{id}", clienteSalvo.getId())
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(clienteSalvo.getId()))
-                .andExpect(jsonPath("$.nome").value("Maria Silva Santos"))
-                .andExpect(jsonPath("$.email").value("maria@teste.com"));
+                .andExpect(jsonPath("$.data.id").value(clienteSalvo.getId()))
+                .andExpect(jsonPath("$.data.nome").value("Maria Silva Santos"))
+                .andExpect(jsonPath("$.data.email").value("maria@teste.com"));
     }
 
     @Test
@@ -202,10 +202,10 @@ class ClienteControllerIT {
         // Given
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
-        // When & Then
+        // When & Then - esta rota responde {mensagem, cliente}, formato diferente de GET /{id}
         mockMvc.perform(patch("/api/clientes/{id}/status", clienteSalvo.getId()).with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(clienteSalvo.getId()));
+                .andExpect(jsonPath("$.cliente.id").value(clienteSalvo.getId()));
     }
 
     @Test
