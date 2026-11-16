@@ -186,13 +186,14 @@
       <removeUnusedImports/>
       <importOrder/>
       <googleJavaFormat>
-       <version>1.30.0</version>
-       <style>GOOGLE</style>
+       <style>AOSP</style>
       </googleJavaFormat>
      </java>
     </configuration>
    </plugin>
   </plugins>
  </build>
+
+
 
 </project>
