@@ -215,9 +215,10 @@ class ClienteControllerIT {
         // Given
         clienteRepository.save(cliente);
 
-        // When & Then
+        // When & Then - endpoint real: GET /api/clientes/buscar?nome=...
         mockMvc.perform(
-                        get("/api/clientes/nome/{nome}", "Silva")
+                        get("/api/clientes/buscar")
+                                .param("nome", "Silva")
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

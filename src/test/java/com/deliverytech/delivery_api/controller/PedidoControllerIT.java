@@ -269,7 +269,8 @@ class PedidoControllerIT {
     @DisplayName("PATCH /api/pedidos/{id}/status - Deve atualizar status do pedido")
     @WithMockUser
     void testAtualizarStatusPedido_DeveRetornar200() throws Exception {
-        // Given
+        // Given - status CRIADO para permitir a transição CRIADO -> CONFIRMADO
+        pedido.setStatus(StatusPedido.CRIADO);
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then - Usando PATCH conforme controller
@@ -334,8 +335,15 @@ class PedidoControllerIT {
     @DisplayName("PUT /api/pedidos/{id}/confirmar - Deve confirmar pedido")
     @WithMockUser
     void testConfirmarPedido_DeveRetornar200() throws Exception {
-        // Given - Pedido no status CRIADO
+        // Given - Pedido no status CRIADO, com ao menos um item
+        // (o controller rejeita confirmação de pedido sem itens)
         pedido.setStatus(StatusPedido.CRIADO);
+        ItemPedido item = new ItemPedido();
+        item.setPedido(pedido);
+        item.setProduto(produto);
+        item.setQuantidade(2);
+        item.setPrecoUnitario(BigDecimal.valueOf(35.90));
+        pedido.setItens(new java.util.ArrayList<>(List.of(item)));
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then
