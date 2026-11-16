@@ -37,7 +37,8 @@ public class ResponseCaptureFilter implements Filter {
 
         // ✅ Wrapper para capturar request e response
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(httpRequest);
-        ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(httpResponse);
+        ContentCachingResponseWrapper responseWrapper =
+                new ContentCachingResponseWrapper(httpResponse);
 
         try {
             // ✅ Executar a requisição
@@ -52,8 +53,8 @@ public class ResponseCaptureFilter implements Filter {
         }
     }
 
-    private void capturarResposta(ContentCachingRequestWrapper request,
-                                 ContentCachingResponseWrapper response) {
+    private void capturarResposta(
+            ContentCachingRequestWrapper request, ContentCachingResponseWrapper response) {
         try {
             // ✅ Criar diretório se não existir
             File dir = new File("entregaveis");
@@ -62,12 +63,11 @@ public class ResponseCaptureFilter implements Filter {
             }
 
             // ✅ Gerar nome do arquivo
-            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String timestamp =
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String method = request.getMethod();
-            String endpoint = request.getRequestURI()
-                    .replace("/api/", "")
-                    .replace("/", "_");
-            
+            String endpoint = request.getRequestURI().replace("/api/", "").replace("/", "_");
+
             String fileName = String.format("%s_%s_%s.txt", method, endpoint, timestamp);
 
             // ✅ Capturar dados da requisição
@@ -86,7 +86,11 @@ public class ResponseCaptureFilter implements Filter {
             // ✅ Preparar conteúdo do arquivo
             StringBuilder content = new StringBuilder();
             content.append("=== ENTREGA - TESTE DE ENDPOINT ===\n");
-            content.append("Data/Hora: ").append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))).append("\n");
+            content.append("Data/Hora: ")
+                    .append(
+                            LocalDateTime.now()
+                                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+                    .append("\n");
             content.append("Método: ").append(method).append("\n");
             content.append("URL Completa: ").append(fullUrl).append("\n");
             content.append("Status HTTP: ").append(response.getStatus()).append("\n");
@@ -97,7 +101,10 @@ public class ResponseCaptureFilter implements Filter {
                 content.append("\n=== DADOS ENVIADOS ===\n");
                 try {
                     Object jsonRequest = objectMapper.readValue(requestBody, Object.class);
-                    String formattedRequest = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonRequest);
+                    String formattedRequest =
+                            objectMapper
+                                    .writerWithDefaultPrettyPrinter()
+                                    .writeValueAsString(jsonRequest);
                     content.append(formattedRequest);
                 } catch (Exception e) {
                     content.append(requestBody);
@@ -109,7 +116,10 @@ public class ResponseCaptureFilter implements Filter {
             if (!responseBody.isEmpty()) {
                 try {
                     Object jsonResponse = objectMapper.readValue(responseBody, Object.class);
-                    String formattedResponse = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonResponse);
+                    String formattedResponse =
+                            objectMapper
+                                    .writerWithDefaultPrettyPrinter()
+                                    .writeValueAsString(jsonResponse);
                     content.append(formattedResponse);
                 } catch (Exception e) {
                     content.append(responseBody);

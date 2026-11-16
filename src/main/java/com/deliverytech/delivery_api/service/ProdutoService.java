@@ -6,30 +6,30 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProdutoService {
-  // === OPERAÇÕES BÁSICAS ===
-  Produto cadastrar(Produto produto);
+    // === OPERAÇÕES BÁSICAS ===
+    Produto cadastrar(Produto produto);
 
-  Optional<Produto> buscarPorId(Long id);
+    Optional<Produto> buscarPorId(Long id);
 
-  List<Produto> listarTodos();
+    List<Produto> listarTodos();
 
-  Produto atualizar(Long id, Produto produtoAtualizado);
+    Produto atualizar(Long id, Produto produtoAtualizado);
 
-  void inativar(Long id);
+    void inativar(Long id);
 
-  void deletar(Long id);
+    void deletar(Long id);
 
-  // === BUSCAS ESPECÍFICAS ===
-  List<Produto> buscarPorRestaurante(Long restauranteId);
+    // === BUSCAS ESPECÍFICAS ===
+    List<Produto> buscarPorRestaurante(Long restauranteId);
 
-  List<Produto> buscarPorCategoria(String categoria);
+    List<Produto> buscarPorCategoria(String categoria);
 
-  List<Produto> listarDisponiveis();
+    List<Produto> listarDisponiveis();
 
-  List<Produto> buscarPorNome(String nome);
+    List<Produto> buscarPorNome(String nome);
 
-  // === REGRAS DE NEGÓCIO ===
-  void alterarDisponibilidade(Long id, boolean disponivel);
+    // === REGRAS DE NEGÓCIO ===
+    void alterarDisponibilidade(Long id, boolean disponivel);
 
-  void validarPreco(BigDecimal preco);
+    void validarPreco(BigDecimal preco);
 }

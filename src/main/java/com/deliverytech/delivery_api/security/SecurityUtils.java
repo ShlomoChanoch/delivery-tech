@@ -1,4 +1,5 @@
 package com.deliverytech.delivery_api.security;
+
 // import com.deliverytech.delivery_api.entity.Usuario;
 import com.deliverytech.delivery_api.model.Usuario;
 import java.util.Optional;
@@ -22,9 +23,7 @@ public class SecurityUtils {
     }
 
     public static boolean hasRole(String role) {
-        return getCurrentUser()
-                .map(u -> u.getRole().name().equals(role))
-                .orElse(false);
+        return getCurrentUser().map(u -> u.getRole().name().equals(role)).orElse(false);
     }
 
     public static boolean isRestaurante() {

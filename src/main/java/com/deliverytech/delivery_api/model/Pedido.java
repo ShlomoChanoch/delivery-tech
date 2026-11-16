@@ -13,7 +13,8 @@ import lombok.*;
 @Builder
 public class Pedido {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -30,7 +31,6 @@ public class Pedido {
     private BigDecimal subtotal;
     private String observacoes;
 
-
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
@@ -39,6 +39,5 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ItemPedido> itens;
 
-    @Embedded
-    private Endereco enderecoEntrega;
+    @Embedded private Endereco enderecoEntrega;
 }

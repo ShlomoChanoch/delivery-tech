@@ -10,15 +10,11 @@ import lombok.*;
 @AllArgsConstructor
 public class PedidoRequest {
 
-    @NotNull
-    private Long clienteId;
+    @NotNull private Long clienteId;
 
-    @NotNull
-    private Long restauranteId;
+    @NotNull private Long restauranteId;
 
-    @NotNull
-    private Endereco enderecoEntrega;
+    @NotNull private Endereco enderecoEntrega;
 
-    @NotNull
-    private List<ItemPedidoRequest> itens;
+    @NotNull private List<ItemPedidoRequest> itens;
 }

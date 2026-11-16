@@ -13,16 +13,17 @@ public class ModelMapperConfig {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
-        
+
         // Configuração para Pedido → PedidoResponse
-        mapper.addMappings(new PropertyMap<Pedido, PedidoResponse>() {
-            @Override
-            protected void configure() {
-                map().setClienteId(source.getCliente().getId());
-                map().setRestauranteId(source.getRestaurante().getId());
-            }
-        });
-        
+        mapper.addMappings(
+                new PropertyMap<Pedido, PedidoResponse>() {
+                    @Override
+                    protected void configure() {
+                        map().setClienteId(source.getCliente().getId());
+                        map().setRestauranteId(source.getRestaurante().getId());
+                    }
+                });
+
         return mapper;
     }
 }

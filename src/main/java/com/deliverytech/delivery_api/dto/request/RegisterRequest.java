@@ -19,8 +19,7 @@ public class RegisterRequest {
 
     @NotBlank(message = "Nome é obrigatório")
     private String nome;
+
     @NotBlank(message = "Papel é obrigatório")
     private Role role;
-
-    
 }

@@ -33,14 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ClienteControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private ClienteService clienteService;
+    @MockBean private ClienteService clienteService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     private ClienteRequest clienteRequest;
     private Cliente cliente;
@@ -73,10 +70,11 @@ class ClienteControllerTest {
         when(clienteService.cadastrar(any(ClienteRequest.class))).thenReturn(cliente);
 
         // When & Then
-        mockMvc.perform(post("/api/clientes")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clienteRequest)))
+        mockMvc.perform(
+                        post("/api/clientes")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1)) // ✅ Controller retorna Cliente direto
                 .andExpect(jsonPath("$.nome").value("João Silva Santos"))
@@ -91,8 +89,7 @@ class ClienteControllerTest {
         when(clienteService.listarAtivos()).thenReturn(clientes);
 
         // When & Then
-        mockMvc.perform(get("/api/clientes")
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/clientes").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").value(1)) // ✅ Array direto de Clientes
@@ -107,8 +104,7 @@ class ClienteControllerTest {
         when(clienteService.buscarPorId(1L)).thenReturn(Optional.of(cliente));
 
         // When & Then
-        mockMvc.perform(get("/api/clientes/{id}", 1L)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/clientes/{id}", 1L).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(1)) // ✅ ApiResponseWrapper format
                 .andExpect(jsonPath("$.data.nome").value("João Silva Santos"))
@@ -136,8 +132,9 @@ class ClienteControllerTest {
         when(clienteService.buscarPorEmail("joao@email.com")).thenReturn(Optional.of(cliente));
 
         // When & Then
-        mockMvc.perform(get("/api/clientes/email/{email}", "joao@email.com")
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/clientes/email/{email}", "joao@email.com")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1)) // ✅ Cliente direto (sem wrapper)
                 .andExpect(jsonPath("$.email").value("joao@email.com"))
@@ -159,10 +156,11 @@ class ClienteControllerTest {
                 .thenReturn(clienteAtualizado);
 
         // When & Then
-        mockMvc.perform(put("/api/clientes/{id}", 1L)
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clienteRequest)))
+        mockMvc.perform(
+                        put("/api/clientes/{id}", 1L)
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1)) // ✅ Controller retorna Cliente direto
                 .andExpect(jsonPath("$.nome").value("João Silva Atualizado"));
@@ -182,10 +180,11 @@ class ClienteControllerTest {
         when(clienteService.ativarDesativarCliente(1L)).thenReturn(clienteInativo);
 
         // When & Then
-        mockMvc.perform(patch("/api/clientes/{id}/status", 1L)
-                .with(csrf()))
+        mockMvc.perform(patch("/api/clientes/{id}/status", 1L).with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.mensagem").value("Cliente desativado com sucesso")) // ✅ Estrutura do Map
+                .andExpect(
+                        jsonPath("$.mensagem")
+                                .value("Cliente desativado com sucesso")) // ✅ Estrutura do Map
                 .andExpect(jsonPath("$.cliente.id").value(1)) // ✅ Cliente dentro do Map
                 .andExpect(jsonPath("$.cliente.nome").value("João Silva Santos"))
                 .andExpect(jsonPath("$.cliente.ativo").value(false));
@@ -199,9 +198,10 @@ class ClienteControllerTest {
         when(clienteService.buscarPorNome("Silva")).thenReturn(clientes);
 
         // When & Then
-        mockMvc.perform(get("/api/clientes/buscar")
-                .param("nome", "Silva")
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/clientes/buscar")
+                                .param("nome", "Silva")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id").value(1)) // ✅ Array direto de Clientes
@@ -216,10 +216,11 @@ class ClienteControllerTest {
         ClienteRequest requestInvalido = new ClienteRequest();
 
         // When & Then
-        mockMvc.perform(post("/api/clientes")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestInvalido)))
+        mockMvc.perform(
+                        post("/api/clientes")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestInvalido)))
                 .andExpect(status().isBadRequest());
     }
 

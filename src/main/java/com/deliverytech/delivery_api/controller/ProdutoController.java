@@ -1,4 +1,4 @@
-//mudanças 16/07
+// mudanças 16/07
 
 package com.deliverytech.delivery_api.controller;
 
@@ -25,45 +25,71 @@ public class ProdutoController {
 
     @PostMapping
     public ResponseEntity<ProdutoResponse> cadastrar(@Valid @RequestBody ProdutoRequest request) {
-        Restaurante restaurante = restauranteService.buscarPorId(request.getRestauranteId())
-                .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
+        Restaurante restaurante =
+                restauranteService
+                        .buscarPorId(request.getRestauranteId())
+                        .orElseThrow(() -> new RuntimeException("Restaurante não encontrado"));
 
-        Produto produto = Produto.builder()
-                .nome(request.getNome())
-                .categoria(request.getCategoria())
-                .descricao(request.getDescricao())
-                .preco(request.getPreco())
-                .disponivel(true)
-                .restaurante(restaurante)
-                .build();
+        Produto produto =
+                Produto.builder()
+                        .nome(request.getNome())
+                        .categoria(request.getCategoria())
+                        .descricao(request.getDescricao())
+                        .preco(request.getPreco())
+                        .disponivel(true)
+                        .restaurante(restaurante)
+                        .build();
 
         Produto salvo = produtoService.cadastrar(produto);
-        return ResponseEntity.status(201).body(new ProdutoResponse(
-                salvo.getId(), salvo.getNome(), salvo.getCategoria(), 
-                salvo.getDescricao(), salvo.getPreco(), salvo.getDisponivel()));
+        return ResponseEntity.status(201)
+                .body(
+                        new ProdutoResponse(
+                                salvo.getId(),
+                                salvo.getNome(),
+                                salvo.getCategoria(),
+                                salvo.getDescricao(),
+                                salvo.getPreco(),
+                                salvo.getDisponivel()));
     }
 
     @GetMapping("/restaurante/{restauranteId}")
     public List<ProdutoResponse> listarPorRestaurante(@PathVariable Long restauranteId) {
         return produtoService.buscarPorRestaurante(restauranteId).stream()
-                .map(p -> new ProdutoResponse(p.getId(), p.getNome(), p.getCategoria(), p.getDescricao(), p.getPreco(), p.getDisponivel()))
+                .map(p ->
+                        new ProdutoResponse(
+                                p.getId(),
+                                p.getNome(),
+                                p.getCategoria(),
+                                p.getDescricao(),
+                                p.getPreco(),
+                                p.getDisponivel()))
                 .collect(Collectors.toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponse> atualizar(@PathVariable Long id, @Valid @RequestBody ProdutoRequest request) {
-        Produto atualizado = Produto.builder()
-                .nome(request.getNome())
-                .categoria(request.getCategoria())
-                .descricao(request.getDescricao())
-                .preco(request.getPreco())
-                .build();
+    public ResponseEntity<ProdutoResponse> atualizar(
+            @PathVariable Long id, @Valid @RequestBody ProdutoRequest request) {
+        Produto atualizado =
+                Produto.builder()
+                        .nome(request.getNome())
+                        .categoria(request.getCategoria())
+                        .descricao(request.getDescricao())
+                        .preco(request.getPreco())
+                        .build();
         Produto salvo = produtoService.atualizar(id, atualizado);
-        return ResponseEntity.ok(new ProdutoResponse(salvo.getId(), salvo.getNome(), salvo.getCategoria(), salvo.getDescricao(), salvo.getPreco(), salvo.getDisponivel()));
+        return ResponseEntity.ok(
+                new ProdutoResponse(
+                        salvo.getId(),
+                        salvo.getNome(),
+                        salvo.getCategoria(),
+                        salvo.getDescricao(),
+                        salvo.getPreco(),
+                        salvo.getDisponivel()));
     }
 
     @PatchMapping("/{id}/disponibilidade")
-    public ResponseEntity<Void> alterarDisponibilidade(@PathVariable Long id, @RequestParam boolean disponivel) {
+    public ResponseEntity<Void> alterarDisponibilidade(
+            @PathVariable Long id, @RequestParam boolean disponivel) {
         produtoService.alterarDisponibilidade(id, disponivel);
         return ResponseEntity.noContent().build();
     }
@@ -72,17 +98,30 @@ public class ProdutoController {
     @GetMapping
     public List<ProdutoResponse> listarTodos() {
         return produtoService.listarTodos().stream()
-                .map(p -> new ProdutoResponse(p.getId(), p.getNome(), p.getCategoria(),
-                     p.getDescricao(), p.getPreco(), p.getDisponivel()))
+                .map(p ->
+                        new ProdutoResponse(
+                                p.getId(),
+                                p.getNome(),
+                                p.getCategoria(),
+                                p.getDescricao(),
+                                p.getPreco(),
+                                p.getDisponivel()))
                 .collect(Collectors.toList());
     }
 
     // ADICIONAR: Buscar produto por ID
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoResponse> buscarPorId(@PathVariable Long id) {
-        return produtoService.buscarPorId(id)
-                .map(p -> new ProdutoResponse(p.getId(), p.getNome(), p.getCategoria(),
-                     p.getDescricao(), p.getPreco(), p.getDisponivel()))
+        return produtoService
+                .buscarPorId(id)
+                .map(p ->
+                        new ProdutoResponse(
+                                p.getId(),
+                                p.getNome(),
+                                p.getCategoria(),
+                                p.getDescricao(),
+                                p.getPreco(),
+                                p.getDisponivel()))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -101,34 +140,39 @@ public class ProdutoController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Buscar produtos por categoria
-     * GET /api/produtos/categoria/{categoria}
-     */
+    /** Buscar produtos por categoria GET /api/produtos/categoria/{categoria} */
     @GetMapping("/categoria/{categoria}")
     public List<ProdutoResponse> buscarPorCategoria(@PathVariable String categoria) {
         return produtoService.buscarPorCategoria(categoria).stream()
-                .map(p -> new ProdutoResponse(
-                    p.getId(), p.getNome(), p.getCategoria(), 
-                    p.getDescricao(), p.getPreco(), p.getDisponivel()))
+                .map(p ->
+                        new ProdutoResponse(
+                                p.getId(),
+                                p.getNome(),
+                                p.getCategoria(),
+                                p.getDescricao(),
+                                p.getPreco(),
+                                p.getDisponivel()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Busca produtos por nome
-     * GET /api/produtos/buscar?nome={nome}
-     */
+    /** Busca produtos por nome GET /api/produtos/buscar?nome={nome} */
     @GetMapping("/buscar")
     public ResponseEntity<List<ProdutoResponse>> buscarPorNome(@RequestParam String nome) {
         try {
             List<Produto> produtos = produtoService.buscarPorNome(nome);
-            
-            List<ProdutoResponse> response = produtos.stream()
-                .map(p -> new ProdutoResponse(
-                    p.getId(), p.getNome(), p.getCategoria(),
-                    p.getDescricao(), p.getPreco(), p.getDisponivel()))
-                .collect(Collectors.toList());
-            
+
+            List<ProdutoResponse> response =
+                    produtos.stream()
+                            .map(p ->
+                                    new ProdutoResponse(
+                                            p.getId(),
+                                            p.getNome(),
+                                            p.getCategoria(),
+                                            p.getDescricao(),
+                                            p.getPreco(),
+                                            p.getDisponivel()))
+                            .collect(Collectors.toList());
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // Log do erro para debug

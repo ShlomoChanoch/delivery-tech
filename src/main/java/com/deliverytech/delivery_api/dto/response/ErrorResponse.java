@@ -8,8 +8,8 @@ import java.util.Map;
 import lombok.Data;
 
 @Schema(
-    description = "Resposta de erro padronizada com a RFC 7807",
-    title = "Resposta de erro padronizada")
+        description = "Resposta de erro padronizada com a RFC 7807",
+        title = "Resposta de erro padronizada")
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
@@ -33,8 +33,8 @@ public class ErrorResponse {
     @Schema(description = "Detalhes adicionais")
     private final Map<String, String> details;
 
-    public ErrorResponse(int status, String error, String message, String path,
-            Map<String, String> details) {
+    public ErrorResponse(
+            int status, String error, String message, String path, Map<String, String> details) {
         this.timestamp = LocalDateTime.now();
         this.status = status;
         this.error = error;

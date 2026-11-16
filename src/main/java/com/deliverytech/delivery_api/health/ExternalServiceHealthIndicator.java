@@ -13,12 +13,16 @@ public class ExternalServiceHealthIndicator implements HealthIndicator {
     public Health health() {
         try {
             if (serviceUp) {
-                return Health.up().withDetail("ServiceName", "Payment gateway")
-                        .withDetail("status", "Reachable").build();
+                return Health.up()
+                        .withDetail("ServiceName", "Payment gateway")
+                        .withDetail("status", "Reachable")
+                        .build();
             }
 
-            return Health.down().withDetail("ServiceName", "Payment gateway")
-                    .withDetail("status", "Service not reachable or responding").build();
+            return Health.down()
+                    .withDetail("ServiceName", "Payment gateway")
+                    .withDetail("status", "Service not reachable or responding")
+                    .build();
         } catch (Exception e) {
             return Health.down(e).withDetail("error", e.getMessage()).build();
         }

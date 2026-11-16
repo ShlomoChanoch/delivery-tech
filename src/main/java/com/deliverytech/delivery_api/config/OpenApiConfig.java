@@ -16,19 +16,20 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
-            .info(new Info()
-                .title("Delivery API")
-                .version("1.0")
-                .description("Documentação da API de autenticação com JWT"))
-            .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
-            .components(new Components()
-                .addSecuritySchemes(securitySchemeName,
-                    new SecurityScheme()
-                        .name(securitySchemeName)
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT")
-                )
-            );
+                .info(
+                        new Info()
+                                .title("Delivery API")
+                                .version("1.0")
+                                .description("Documentação da API de autenticação com JWT"))
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                .components(
+                        new Components()
+                                .addSecuritySchemes(
+                                        securitySchemeName,
+                                        new SecurityScheme()
+                                                .name(securitySchemeName)
+                                                .type(SecurityScheme.Type.HTTP)
+                                                .scheme("bearer")
+                                                .bearerFormat("JWT")));
     }
 }

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
 
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -13,7 +12,7 @@ import lombok.*;
 @Builder
 public class Cliente {
 
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -24,11 +23,9 @@ public class Cliente {
     @Column(unique = true)
     private String email;
 
-    @Builder.Default
-    private Boolean ativo = true;
+    @Builder.Default private Boolean ativo = true;
 
-    @Builder.Default
-    private LocalDateTime dataCriacao = LocalDateTime.now();
+    @Builder.Default private LocalDateTime dataCriacao = LocalDateTime.now();
 
     // IMPLEMENTAR APENAS O MÉTODO PERSONALIZADO
     @JsonIgnore
@@ -41,7 +38,15 @@ public class Cliente {
     private List<Pedido> pedidos; */
 
     // Construtor customizado para testes
-    public Cliente(Long id, String nome, String email, String telefone, String endereco, LocalDateTime dataCriacao, Boolean ativo, Object unused) {
+    public Cliente(
+            Long id,
+            String nome,
+            String email,
+            String telefone,
+            String endereco,
+            LocalDateTime dataCriacao,
+            Boolean ativo,
+            Object unused) {
         this.id = id;
         this.nome = nome;
         this.email = email;

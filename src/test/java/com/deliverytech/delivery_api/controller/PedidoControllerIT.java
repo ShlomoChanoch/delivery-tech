@@ -34,23 +34,17 @@ import org.springframework.web.context.WebApplicationContext;
 @Transactional
 class PedidoControllerIT {
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    @Autowired private PedidoRepository pedidoRepository;
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    @Autowired private ClienteRepository clienteRepository;
 
-    @Autowired
-    private RestauranteRepository restauranteRepository;
+    @Autowired private RestauranteRepository restauranteRepository;
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
+    @Autowired private ProdutoRepository produtoRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
     private Cliente cliente;
@@ -62,10 +56,10 @@ class PedidoControllerIT {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .build();
+        mockMvc =
+                MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                        .apply(springSecurity())
+                        .build();
 
         // Limpar banco antes de cada teste
         pedidoRepository.deleteAll();
@@ -144,14 +138,17 @@ class PedidoControllerIT {
     @WithMockUser
     void testCriarPedido_ComDadosValidos_DeveRetornar201() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/pedidos")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(pedidoRequest)))
+        mockMvc.perform(
+                        post("/api/pedidos")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pedidoRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.clienteId").value(cliente.getId())) // ✅ Corrigido
                 .andExpect(jsonPath("$.restauranteId").value(restaurante.getId())) // ✅ Corrigido
-                .andExpect(jsonPath("$.status").value("CRIADO")) // ✅ Status inicial conforme controller
+                .andExpect(
+                        jsonPath("$.status")
+                                .value("CRIADO")) // ✅ Status inicial conforme controller
                 .andExpect(jsonPath("$.id").exists());
     }
 
@@ -163,10 +160,11 @@ class PedidoControllerIT {
         pedidoRequest.setClienteId(999L); // ID inexistente
 
         // When & Then
-        mockMvc.perform(post("/api/pedidos")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(pedidoRequest)))
+        mockMvc.perform(
+                        post("/api/pedidos")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pedidoRequest)))
                 .andExpect(status().isInternalServerError()); // ✅ Controller lança RuntimeException
     }
 
@@ -178,10 +176,11 @@ class PedidoControllerIT {
         pedidoRequest.setRestauranteId(999L); // ID inexistente
 
         // When & Then
-        mockMvc.perform(post("/api/pedidos")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(pedidoRequest)))
+        mockMvc.perform(
+                        post("/api/pedidos")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pedidoRequest)))
                 .andExpect(status().isInternalServerError()); // ✅ Controller lança RuntimeException
     }
 
@@ -194,10 +193,11 @@ class PedidoControllerIT {
         // Não setar clienteId, restauranteId, etc.
 
         // When & Then
-        mockMvc.perform(post("/api/pedidos")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestInvalido)))
+        mockMvc.perform(
+                        post("/api/pedidos")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestInvalido)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -209,8 +209,9 @@ class PedidoControllerIT {
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then
-        mockMvc.perform(get("/api/pedidos/{id}", pedidoSalvo.getId())
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/pedidos/{id}", pedidoSalvo.getId())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(pedidoSalvo.getId()))
                 .andExpect(jsonPath("$.clienteId").value(cliente.getId())) // ✅ Corrigido
@@ -222,8 +223,7 @@ class PedidoControllerIT {
     @WithMockUser
     void testBuscarPedidoPorId_PedidoInexistente_DeveRetornar500() throws Exception {
         // When & Then - Controller lança RuntimeException para não encontrado
-        mockMvc.perform(get("/api/pedidos/{id}", 999L)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/pedidos/{id}", 999L).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -233,7 +233,7 @@ class PedidoControllerIT {
     void testListarTodosPedidos_DeveRetornar200() throws Exception {
         // Given
         pedidoRepository.save(pedido);
-        
+
         Pedido pedido2 = new Pedido();
         pedido2.setCliente(cliente);
         pedido2.setRestaurante(restaurante);
@@ -243,8 +243,7 @@ class PedidoControllerIT {
         pedidoRepository.save(pedido2);
 
         // When & Then
-        mockMvc.perform(get("/api/pedidos")
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/pedidos").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2));
@@ -258,8 +257,9 @@ class PedidoControllerIT {
         pedidoRepository.save(pedido);
 
         // When & Then
-        mockMvc.perform(get("/api/pedidos/cliente/{id}", cliente.getId())
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/pedidos/cliente/{id}", cliente.getId())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].clienteId").value(cliente.getId())); // ✅ Corrigido
@@ -273,10 +273,12 @@ class PedidoControllerIT {
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then - Usando PATCH conforme controller
-        mockMvc.perform(patch("/api/pedidos/{id}/status", pedidoSalvo.getId())
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"status\":\"CONFIRMADO\"}")) // ✅ JSON conforme StatusUpdateRequest
+        mockMvc.perform(
+                        patch("/api/pedidos/{id}/status", pedidoSalvo.getId())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"status\":\"CONFIRMADO\"}")) // ✅ JSON conforme
+                // StatusUpdateRequest
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CONFIRMADO"));
     }
@@ -289,11 +291,13 @@ class PedidoControllerIT {
         pedidoRepository.save(pedido);
 
         // When & Then
-        mockMvc.perform(get("/api/pedidos/restaurante/{id}", restaurante.getId())
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/pedidos/restaurante/{id}", restaurante.getId())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].restauranteId").value(restaurante.getId())); // ✅ Corrigido
+                .andExpect(
+                        jsonPath("$[0].restauranteId").value(restaurante.getId())); // ✅ Corrigido
     }
 
     @Test
@@ -304,8 +308,7 @@ class PedidoControllerIT {
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then - Usando endpoint correto do controller
-        mockMvc.perform(delete("/api/pedidos/{id}/cancelar", pedidoSalvo.getId())
-                .with(csrf()))
+        mockMvc.perform(delete("/api/pedidos/{id}/cancelar", pedidoSalvo.getId()).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CANCELADO"));
     }
@@ -318,10 +321,11 @@ class PedidoControllerIT {
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then
-        mockMvc.perform(post("/api/pedidos/{id}/itens", pedidoSalvo.getId())
-                .with(csrf())
-                .param("produtoId", produto.getId().toString())
-                .param("quantidade", "2"))
+        mockMvc.perform(
+                        post("/api/pedidos/{id}/itens", pedidoSalvo.getId())
+                                .with(csrf())
+                                .param("produtoId", produto.getId().toString())
+                                .param("quantidade", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(pedidoSalvo.getId()));
     }
@@ -335,8 +339,7 @@ class PedidoControllerIT {
         Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
         // When & Then
-        mockMvc.perform(put("/api/pedidos/{id}/confirmar", pedidoSalvo.getId())
-                .with(csrf()))
+        mockMvc.perform(put("/api/pedidos/{id}/confirmar", pedidoSalvo.getId()).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("CONFIRMADO"));
     }
@@ -346,10 +349,11 @@ class PedidoControllerIT {
     @WithMockUser
     void testCalcularValorTotal_DeveRetornar200() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/pedidos/calcular")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(pedidoRequest)))
+        mockMvc.perform(
+                        post("/api/pedidos/calcular")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(pedidoRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.valorTotal").exists())
                 .andExpect(jsonPath("$.subtotal").exists())

@@ -31,14 +31,11 @@ import org.springframework.web.context.WebApplicationContext;
 @Transactional
 class ClienteControllerIT {
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+    @Autowired private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    @Autowired private ClienteRepository clienteRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
     private ClienteRequest clienteRequest;
@@ -46,10 +43,10 @@ class ClienteControllerIT {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .build();
+        mockMvc =
+                MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                        .apply(springSecurity())
+                        .build();
 
         // Limpar banco antes de cada teste
         clienteRepository.deleteAll();
@@ -74,10 +71,11 @@ class ClienteControllerIT {
     @WithMockUser
     void testCriarCliente_ComDadosValidos_DeveRetornar201() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/clientes")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clienteRequest)))
+        mockMvc.perform(
+                        post("/api/clientes")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(clienteRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nome").value("João Silva Santos"))
                 .andExpect(jsonPath("$.email").value("joao@teste.com"))
@@ -98,10 +96,11 @@ class ClienteControllerIT {
         requestInvalido.setEndereco(""); // Endereço vazio
 
         // When & Then
-        mockMvc.perform(post("/api/clientes")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestInvalido)))
+        mockMvc.perform(
+                        post("/api/clientes")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestInvalido)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -113,8 +112,9 @@ class ClienteControllerIT {
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
         // When & Then
-        mockMvc.perform(get("/api/clientes/{id}", clienteSalvo.getId())
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/clientes/{id}", clienteSalvo.getId())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(clienteSalvo.getId()))
                 .andExpect(jsonPath("$.nome").value("Maria Silva Santos"))
@@ -126,8 +126,7 @@ class ClienteControllerIT {
     @WithMockUser
     void testBuscarClientePorId_ClienteInexistente_DeveRetornar404() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/clientes/{id}", 999L)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/clientes/{id}", 999L).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -137,7 +136,7 @@ class ClienteControllerIT {
     void testListarClientesAtivos_DeveRetornar200() throws Exception {
         // Given
         clienteRepository.save(cliente);
-        
+
         Cliente cliente2 = new Cliente();
         cliente2.setNome("Pedro Santos Silva");
         cliente2.setEmail("pedro@teste.com");
@@ -147,8 +146,7 @@ class ClienteControllerIT {
         clienteRepository.save(cliente2);
 
         // When & Then
-        mockMvc.perform(get("/api/clientes")
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/clientes").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2))
@@ -162,7 +160,7 @@ class ClienteControllerIT {
     void testAtualizarCliente_ClienteExistente_DeveRetornar200() throws Exception {
         // Given
         Cliente clienteSalvo = clienteRepository.save(cliente);
-        
+
         ClienteRequest requestAtualizacao = new ClienteRequest();
         requestAtualizacao.setNome("Maria Silva Atualizada");
         requestAtualizacao.setEmail("maria.atualizada@teste.com");
@@ -170,10 +168,11 @@ class ClienteControllerIT {
         requestAtualizacao.setEndereco("Av Atualizada, 999");
 
         // When & Then
-        mockMvc.perform(put("/api/clientes/{id}", clienteSalvo.getId())
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestAtualizacao)))
+        mockMvc.perform(
+                        put("/api/clientes/{id}", clienteSalvo.getId())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(requestAtualizacao)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(clienteSalvo.getId()))
                 .andExpect(jsonPath("$.nome").value("Maria Silva Atualizada"))
@@ -188,8 +187,9 @@ class ClienteControllerIT {
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
         // When & Then
-        mockMvc.perform(get("/api/clientes/email/{email}", clienteSalvo.getEmail())
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/clientes/email/{email}", clienteSalvo.getEmail())
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("maria@teste.com"))
                 .andExpect(jsonPath("$.nome").value("Maria Silva Santos"));
@@ -203,8 +203,7 @@ class ClienteControllerIT {
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
         // When & Then
-        mockMvc.perform(patch("/api/clientes/{id}/status", clienteSalvo.getId())
-                .with(csrf()))
+        mockMvc.perform(patch("/api/clientes/{id}/status", clienteSalvo.getId()).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(clienteSalvo.getId()));
     }
@@ -217,8 +216,9 @@ class ClienteControllerIT {
         clienteRepository.save(cliente);
 
         // When & Then
-        mockMvc.perform(get("/api/clientes/nome/{nome}", "Silva")
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(
+                        get("/api/clientes/nome/{nome}", "Silva")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].nome").value("Maria Silva Santos"));
@@ -230,7 +230,7 @@ class ClienteControllerIT {
     void testCriarCliente_EmailDuplicado_DeveRetornar400() throws Exception {
         // Given - primeiro cliente
         clienteRepository.save(cliente);
-        
+
         // Segundo cliente com mesmo email
         ClienteRequest clienteDuplicado = new ClienteRequest();
         clienteDuplicado.setNome("Outro Cliente Santos");
@@ -239,10 +239,11 @@ class ClienteControllerIT {
         clienteDuplicado.setEndereco("Outro Endereço");
 
         // When & Then
-        mockMvc.perform(post("/api/clientes")
-                .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clienteDuplicado)))
+        mockMvc.perform(
+                        post("/api/clientes")
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(clienteDuplicado)))
                 .andExpect(status().isBadRequest());
     }
 }

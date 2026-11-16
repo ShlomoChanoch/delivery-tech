@@ -12,9 +12,9 @@ import lombok.*;
 public class ClienteRequest {
 
     @NotBlank(message = "Nome é obrigatório")
-    @Size(min=10, max = 100, message = "Não pode conter menos de 10 ou mais de 100 caracteres")
+    @Size(min = 10, max = 100, message = "Não pode conter menos de 10 ou mais de 100 caracteres")
     private String nome;
-    
+
     @NotBlank(message = "Telefone é obrigatório")
     @Pattern(regexp = "\\d{10,11}", message = "Telefone deve ter 10 ou 11 dígitos")
     private String telefone;

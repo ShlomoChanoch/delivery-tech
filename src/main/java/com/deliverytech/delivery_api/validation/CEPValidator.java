@@ -19,7 +19,7 @@ public class CEPValidator implements ConstraintValidator<ValidCEP, String> {
         }
 
         // Valida se o CEP tem o formato "00000-000" ou "00000000"
-        // Usando regex para corresponder a cinco dígitos, hífen, três dígitos 
+        // Usando regex para corresponder a cinco dígitos, hífen, três dígitos
         // ou oito dígitos seguidos sem hífen
         return value.matches("\\d{5}-\\d{3}") || value.matches("\\d{8}");
     }

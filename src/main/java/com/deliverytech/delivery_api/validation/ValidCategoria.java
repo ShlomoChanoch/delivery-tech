@@ -13,8 +13,10 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCategoria {
-    
+
     String message() default "Categoria inválida";
+
     Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};   
+
+    Class<? extends Payload>[] payload() default {};
 }

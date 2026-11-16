@@ -20,10 +20,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ClienteServiceTest {
 
-    @Mock
-    private ClienteRepository clienteRepository;
+    @Mock private ClienteRepository clienteRepository;
 
-    @Mock  // ✅ Mockando a interface
+    @Mock // ✅ Mockando a interface
     private ClienteService clienteService;
 
     private ClienteRequest clienteRequest;
@@ -61,7 +60,7 @@ class ClienteServiceTest {
         assertEquals("João Silva Santos", resultado.getNome());
         assertEquals("teste@email.com", resultado.getEmail());
         assertTrue(resultado.getAtivo());
-        
+
         verify(clienteService, times(1)).cadastrar(clienteRequest);
     }
 
@@ -70,15 +69,15 @@ class ClienteServiceTest {
     void testBuscarClientePorId_DeveRetornarCliente() {
         // Given
         when(clienteService.buscarPorId(1L)).thenReturn(Optional.of(cliente));
-        
+
         // When
         Optional<Cliente> resultado = clienteService.buscarPorId(1L);
-        
+
         // Then
         assertTrue(resultado.isPresent());
         assertEquals(1L, resultado.get().getId());
         assertEquals("João Silva Santos", resultado.get().getNome());
-        
+
         verify(clienteService, times(1)).buscarPorId(1L);
     }
 
@@ -90,7 +89,7 @@ class ClienteServiceTest {
 
         // When
         Optional<Cliente> resultado = clienteService.buscarPorId(999L);
-        
+
         // Then
         assertFalse(resultado.isPresent());
         verify(clienteService, times(1)).buscarPorId(999L);
@@ -100,17 +99,16 @@ class ClienteServiceTest {
     @DisplayName("Buscar cliente por email deve retornar cliente quando existir")
     void testBuscarClientePorEmail_DeveRetornarCliente() {
         // Given
-        when(clienteService.buscarPorEmail("teste@email.com"))
-            .thenReturn(Optional.of(cliente));
-        
+        when(clienteService.buscarPorEmail("teste@email.com")).thenReturn(Optional.of(cliente));
+
         // When
         Optional<Cliente> resultado = clienteService.buscarPorEmail("teste@email.com");
-        
+
         // Then
         assertTrue(resultado.isPresent());
         assertEquals("teste@email.com", resultado.get().getEmail());
         assertEquals("João Silva Santos", resultado.get().getNome());
-        
+
         verify(clienteService, times(1)).buscarPorEmail("teste@email.com");
     }
 
@@ -123,19 +121,19 @@ class ClienteServiceTest {
         cliente2.setNome("Maria Silva Santos");
         cliente2.setEmail("maria@email.com");
         cliente2.setAtivo(true);
-        
+
         List<Cliente> clientes = List.of(cliente, cliente2);
         when(clienteService.listarAtivos()).thenReturn(clientes);
-        
+
         // When
         List<Cliente> resultado = clienteService.listarAtivos();
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals("João Silva Santos", resultado.get(0).getNome());
         assertEquals("Maria Silva Santos", resultado.get(1).getNome());
-        
+
         verify(clienteService, times(1)).listarAtivos();
     }
 
@@ -145,15 +143,15 @@ class ClienteServiceTest {
         // Given
         List<Cliente> clientes = List.of(cliente);
         when(clienteService.buscarPorNome("Silva")).thenReturn(clientes);
-        
+
         // When
         List<Cliente> resultado = clienteService.buscarPorNome("Silva");
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertTrue(resultado.get(0).getNome().contains("Silva"));
-        
+
         verify(clienteService, times(1)).buscarPorNome("Silva");
     }
 
@@ -168,14 +166,14 @@ class ClienteServiceTest {
 
         when(clienteService.atualizar(eq(1L), any(ClienteRequest.class)))
                 .thenReturn(clienteAtualizado);
-        
+
         // When
         Cliente resultado = clienteService.atualizar(1L, clienteRequest);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals("João Silva Atualizado", resultado.getNome());
-        
+
         verify(clienteService, times(1)).atualizar(1L, clienteRequest);
     }
 
@@ -189,14 +187,14 @@ class ClienteServiceTest {
         clienteInativo.setAtivo(false);
 
         when(clienteService.ativarDesativarCliente(1L)).thenReturn(clienteInativo);
-        
+
         // When
         Cliente resultado = clienteService.ativarDesativarCliente(1L);
-        
+
         // Then
         assertNotNull(resultado);
         assertFalse(resultado.getAtivo());
-        
+
         verify(clienteService, times(1)).ativarDesativarCliente(1L);
     }
 
@@ -205,10 +203,10 @@ class ClienteServiceTest {
     void testInativarCliente_DeveChamarMetodo() {
         // Given
         doNothing().when(clienteService).inativar(1L);
-        
+
         // When
         clienteService.inativar(1L);
-        
+
         // Then
         verify(clienteService, times(1)).inativar(1L);
     }

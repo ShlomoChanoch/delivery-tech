@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatusUpdateRequest {
-    
+
     @NotBlank(message = "Status é obrigatório")
     private String status;
 }

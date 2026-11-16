@@ -21,35 +21,29 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    @Autowired private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    @Autowired private JwtUtil jwtUtil;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    @Autowired private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                    loginRequest.getUsername(), 
-                    loginRequest.getPassword()
-                )
-            );
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    loginRequest.getUsername(), loginRequest.getPassword()));
 
             String token = jwtUtil.generateToken(authentication.getName());
-            
+
             LoginResponse response = new LoginResponse();
             response.setToken(token);
             response.setUsername(authentication.getName());
             response.setMessage("Login realizado com sucesso");
-            
+
             return response;
         } catch (Exception e) {
             throw new RuntimeException("Credenciais inválidas", e);

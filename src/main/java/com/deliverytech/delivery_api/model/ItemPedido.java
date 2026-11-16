@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 public class ItemPedido {
 
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

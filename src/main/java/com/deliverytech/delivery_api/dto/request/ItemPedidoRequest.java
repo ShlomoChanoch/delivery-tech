@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemPedidoRequest {
-    
+
     @NotNull(message = "ID do produto é obrigatório")
     private Long produtoId;
-    
+
     @NotNull(message = "Quantidade é obrigatória")
     @Positive(message = "Quantidade deve ser maior que zero")
     private Integer quantidade;

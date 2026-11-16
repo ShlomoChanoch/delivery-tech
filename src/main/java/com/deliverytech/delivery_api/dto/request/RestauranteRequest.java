@@ -9,15 +9,11 @@ import lombok.*;
 @AllArgsConstructor
 public class RestauranteRequest {
 
-    @NotBlank
-    private String nome;
+    @NotBlank private String nome;
 
-    @NotBlank
-    private String categoria;
+    @NotBlank private String categoria;
 
-    @NotBlank
-    private String endereco;
-
+    @NotBlank private String endereco;
 
     @DecimalMin("0.0")
     @NotNull(message = "Taxa de entrega é obrigatória")

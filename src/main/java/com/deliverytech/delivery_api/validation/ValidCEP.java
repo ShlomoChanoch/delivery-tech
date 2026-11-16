@@ -8,7 +8,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// Indica que essa anotação será incluída na documentação Java (Javadoc) 
+// Indica que essa anotação será incluída na documentação Java (Javadoc)
 @Documented
 
 // Define que essa anotação é uma restrição de validação
@@ -23,9 +23,9 @@ import java.lang.annotation.Target;
 
 // Definição da anotação personalizada @ValidCEP
 public @interface ValidCEP {
-     // Mensagem padrão que será exibida caso a validação falhe
+    // Mensagem padrão que será exibida caso a validação falhe
     String message() default "CEP inválido";
-    
+
     // Permite agrupar validações para diferentes cenários
     Class<?>[] groups() default {};
 

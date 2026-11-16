@@ -8,7 +8,7 @@ public class UserResponse {
     private String email;
     private String nome;
     private String role;
-    
+
     // Método temporário até implementar corretamente
     public static UserResponse fromEntity(Object usuario) {
         UserResponse response = new UserResponse();
@@ -16,6 +16,3 @@ public class UserResponse {
         return response;
     }
 }
-
-
-

@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 
 // Interface de Projeção
 public interface RelatorioVendas {
-  String getNomeRestaurante();
+    String getNomeRestaurante();
 
-  BigDecimal getTotalVendas();
+    BigDecimal getTotalVendas();
 
-  Long getQuantidadePedidos();
+    Long getQuantidadePedidos();
 }

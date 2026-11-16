@@ -8,9 +8,9 @@ import com.deliverytech.delivery_api.model.Usuario;
 
 public interface AuthService {
 
-  LoginResponse login(LoginRequest request);
+    LoginResponse login(LoginRequest request);
 
-  Usuario register(RegisterRequest request);
+    Usuario register(RegisterRequest request);
 
-  UserResponse getCurrentUser();
+    UserResponse getCurrentUser();
 }

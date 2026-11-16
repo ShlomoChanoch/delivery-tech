@@ -17,13 +17,17 @@ public class CustomDiskSpaceHealthIndicator implements HealthIndicator {
             long freeSpace = diskPath.getTotalSpace();
 
             if (freeSpace > THRESHOLD) {
-                return Health.up().withDetail("free-space-mb", freeSpace / (1024 * 1024))
-                        .withDetail("free-space-mb", THRESHOLD / (1024 * 1024)).build();
+                return Health.up()
+                        .withDetail("free-space-mb", freeSpace / (1024 * 1024))
+                        .withDetail("free-space-mb", THRESHOLD / (1024 * 1024))
+                        .build();
             }
 
-            return Health.down().withDetail("free-space-mb", freeSpace / (1024 * 1024))
+            return Health.down()
+                    .withDetail("free-space-mb", freeSpace / (1024 * 1024))
                     .withDetail("free-space-mb", THRESHOLD / (1024 * 1024))
-                    .withDetail("Warning", "Espaço em disco baixo.").build();
+                    .withDetail("Warning", "Espaço em disco baixo.")
+                    .build();
 
         } catch (Exception e) {
             return Health.down(e).withDetail("error", e.getMessage()).build();

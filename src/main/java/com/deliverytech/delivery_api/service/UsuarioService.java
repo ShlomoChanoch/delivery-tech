@@ -8,17 +8,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface UsuarioService {
 
-  Usuario salvar(RegisterRequest usuario);
+    Usuario salvar(RegisterRequest usuario);
 
-  UserDetails buscarPorEmail(String email);
+    UserDetails buscarPorEmail(String email);
 
-  boolean existePorEmail(String email);
+    boolean existePorEmail(String email);
 
-  Object buscarPorId(Long id);
+    Object buscarPorId(Long id);
 
-  void inativarUsuario(Long id);
+    void inativarUsuario(Long id);
 
-  LoginResponse login(LoginRequest loginRequest);
+    LoginResponse login(LoginRequest loginRequest);
 
-  void logout(String token);
+    void logout(String token);
 }

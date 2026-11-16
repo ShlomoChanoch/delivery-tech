@@ -13,21 +13,19 @@ public class ClientHealthIndicator implements HealthIndicator {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHealthIndicator.class);
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    @Autowired private ClienteRepository clienteRepository;
 
     @Override
     public Health health() {
         try {
             long totalClientes = clienteRepository.count();
             return Health.up()
-            .withDetail("total-clientes", totalClientes)
-            .withDetail("status-servico", "Serviço de clientes.")
-            .build();
+                    .withDetail("total-clientes", totalClientes)
+                    .withDetail("status-servico", "Serviço de clientes.")
+                    .build();
         } catch (Exception e) {
             logger.error("Erro ao verificar a saúde do serviço de clientes.");
             return Health.down(e).withDetail("error", e.getMessage()).build();
         }
     }
-
 }

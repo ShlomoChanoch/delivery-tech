@@ -25,8 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class PedidoServiceTest {
 
-    @Mock
-    private PedidoService pedidoService;
+    @Mock private PedidoService pedidoService;
 
     private Pedido pedido;
     private Cliente cliente;
@@ -89,7 +88,7 @@ class PedidoServiceTest {
         assertEquals(StatusPedido.PENDENTE, resultado.getStatus());
         assertEquals(BigDecimal.valueOf(35.90), resultado.getValorTotal());
         assertEquals("João Silva Santos", resultado.getCliente().getNome());
-        
+
         verify(pedidoService, times(1)).criar(pedido);
     }
 
@@ -98,15 +97,15 @@ class PedidoServiceTest {
     void testBuscarPedidoPorId_DeveRetornarPedido() {
         // Given - método que existe
         when(pedidoService.buscarPorId(1L)).thenReturn(pedido);
-        
+
         // When
         Pedido resultado = pedidoService.buscarPorId(1L);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());
         assertEquals("João Silva Santos", resultado.getCliente().getNome());
-        
+
         verify(pedidoService, times(1)).buscarPorId(1L);
     }
 
@@ -116,15 +115,15 @@ class PedidoServiceTest {
         // Given
         List<Pedido> pedidos = List.of(pedido);
         when(pedidoService.buscarPorCliente(1L)).thenReturn(pedidos);
-        
+
         // When
         List<Pedido> resultado = pedidoService.buscarPorCliente(1L);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals("João Silva Santos", resultado.get(0).getCliente().getNome());
-        
+
         verify(pedidoService, times(1)).buscarPorCliente(1L);
     }
 
@@ -135,17 +134,17 @@ class PedidoServiceTest {
         Pedido pedidoAtualizado = new Pedido();
         pedidoAtualizado.setId(1L);
         pedidoAtualizado.setStatus(StatusPedido.CONFIRMADO);
-        
+
         when(pedidoService.atualizarStatus(1L, StatusPedido.CONFIRMADO))
                 .thenReturn(pedidoAtualizado);
-        
+
         // When
         Pedido resultado = pedidoService.atualizarStatus(1L, StatusPedido.CONFIRMADO);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(StatusPedido.CONFIRMADO, resultado.getStatus());
-        
+
         verify(pedidoService, times(1)).atualizarStatus(1L, StatusPedido.CONFIRMADO);
     }
 
@@ -156,19 +155,19 @@ class PedidoServiceTest {
         Pedido pedido2 = new Pedido();
         pedido2.setId(2L);
         pedido2.setStatus(StatusPedido.ENTREGUE);
-        
+
         List<Pedido> pedidos = List.of(pedido, pedido2);
         when(pedidoService.listarTodos()).thenReturn(pedidos);
-        
+
         // When
         List<Pedido> resultado = pedidoService.listarTodos();
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals(StatusPedido.PENDENTE, resultado.get(0).getStatus());
         assertEquals(StatusPedido.ENTREGUE, resultado.get(1).getStatus());
-        
+
         verify(pedidoService, times(1)).listarTodos();
     }
 
@@ -178,14 +177,14 @@ class PedidoServiceTest {
         // Given - usando método que existe
         BigDecimal valorEsperado = BigDecimal.valueOf(40.90);
         when(pedidoService.calcularTotal(pedido)).thenReturn(valorEsperado);
-        
+
         // When
         BigDecimal resultado = pedidoService.calcularTotal(pedido);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(valorEsperado, resultado);
-        
+
         verify(pedidoService, times(1)).calcularTotal(pedido);
     }
 
@@ -195,14 +194,14 @@ class PedidoServiceTest {
         // Given - método que existe na interface
         BigDecimal valorEsperado = BigDecimal.valueOf(71.80); // 2 pizzas * 35.90
         when(pedidoService.calcularTotalPedido(itens)).thenReturn(valorEsperado);
-        
+
         // When
         BigDecimal resultado = pedidoService.calcularTotalPedido(itens);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(valorEsperado, resultado);
-        
+
         verify(pedidoService, times(1)).calcularTotalPedido(itens);
     }
 
@@ -211,17 +210,16 @@ class PedidoServiceTest {
     void testBuscarPedidosPorStatus_DeveRetornarPedidosComStatusEspecificado() {
         // Given
         List<Pedido> pedidosPendentes = List.of(pedido);
-        when(pedidoService.buscarPorStatus(StatusPedido.PENDENTE))
-                .thenReturn(pedidosPendentes);
-        
+        when(pedidoService.buscarPorStatus(StatusPedido.PENDENTE)).thenReturn(pedidosPendentes);
+
         // When
         List<Pedido> resultado = pedidoService.buscarPorStatus(StatusPedido.PENDENTE);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals(StatusPedido.PENDENTE, resultado.get(0).getStatus());
-        
+
         verify(pedidoService, times(1)).buscarPorStatus(StatusPedido.PENDENTE);
     }
 
@@ -232,16 +230,16 @@ class PedidoServiceTest {
         Pedido pedidoCancelado = new Pedido();
         pedidoCancelado.setId(1L);
         pedidoCancelado.setStatus(StatusPedido.CANCELADO);
-        
+
         when(pedidoService.cancelar(1L)).thenReturn(pedidoCancelado);
-        
+
         // When
         Pedido resultado = pedidoService.cancelar(1L);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(StatusPedido.CANCELADO, resultado.getStatus());
-        
+
         verify(pedidoService, times(1)).cancelar(1L);
     }
 
@@ -252,16 +250,16 @@ class PedidoServiceTest {
         Pedido pedidoConfirmado = new Pedido();
         pedidoConfirmado.setId(1L);
         pedidoConfirmado.setStatus(StatusPedido.CONFIRMADO);
-        
+
         when(pedidoService.confirmar(1L)).thenReturn(pedidoConfirmado);
-        
+
         // When
         Pedido resultado = pedidoService.confirmar(1L);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(StatusPedido.CONFIRMADO, resultado.getStatus());
-        
+
         verify(pedidoService, times(1)).confirmar(1L);
     }
 
@@ -271,15 +269,15 @@ class PedidoServiceTest {
         // Given
         List<Pedido> pedidosRestaurante = List.of(pedido);
         when(pedidoService.buscarPorRestaurante(1L)).thenReturn(pedidosRestaurante);
-        
+
         // When
         List<Pedido> resultado = pedidoService.buscarPorRestaurante(1L);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals("Restaurante Teste", resultado.get(0).getRestaurante().getNome());
-        
+
         verify(pedidoService, times(1)).buscarPorRestaurante(1L);
     }
 
@@ -288,14 +286,14 @@ class PedidoServiceTest {
     void testBuscarPorIdComItens_DeveRetornarOptionalComPedido() {
         // Given
         when(pedidoService.buscarPorIdComItens(1L)).thenReturn(Optional.of(pedido));
-        
+
         // When
         Optional<Pedido> resultado = pedidoService.buscarPorIdComItens(1L);
-        
+
         // Then
         assertTrue(resultado.isPresent());
         assertEquals(1L, resultado.get().getId());
-        
+
         verify(pedidoService, times(1)).buscarPorIdComItens(1L);
     }
 
@@ -306,16 +304,16 @@ class PedidoServiceTest {
         LocalDateTime inicio = LocalDateTime.now().minusDays(7);
         LocalDateTime fim = LocalDateTime.now();
         List<Pedido> pedidosPeriodo = List.of(pedido);
-        
+
         when(pedidoService.buscarPorPeriodo(inicio, fim)).thenReturn(pedidosPeriodo);
-        
+
         // When
         List<Pedido> resultado = pedidoService.buscarPorPeriodo(inicio, fim);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
-        
+
         verify(pedidoService, times(1)).buscarPorPeriodo(inicio, fim);
     }
 
@@ -326,19 +324,21 @@ class PedidoServiceTest {
         LocalDate dataInicio = LocalDate.now().minusDays(7);
         LocalDate dataFim = LocalDate.now();
         List<Pedido> pedidosFiltrados = List.of(pedido);
-        
+
         when(pedidoService.listarComFiltros(StatusPedido.PENDENTE, dataInicio, dataFim))
                 .thenReturn(pedidosFiltrados);
-        
+
         // When
-        List<Pedido> resultado = pedidoService.listarComFiltros(StatusPedido.PENDENTE, dataInicio, dataFim);
-        
+        List<Pedido> resultado =
+                pedidoService.listarComFiltros(StatusPedido.PENDENTE, dataInicio, dataFim);
+
         // Then
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals(StatusPedido.PENDENTE, resultado.get(0).getStatus());
-        
-        verify(pedidoService, times(1)).listarComFiltros(StatusPedido.PENDENTE, dataInicio, dataFim);
+
+        verify(pedidoService, times(1))
+                .listarComFiltros(StatusPedido.PENDENTE, dataInicio, dataFim);
     }
 
     @Test
@@ -346,14 +346,14 @@ class PedidoServiceTest {
     void testAdicionarItem_DeveRetornarPedidoAtualizado() {
         // Given
         when(pedidoService.adicionarItem(1L, 1L, 2)).thenReturn(pedido);
-        
+
         // When
         Pedido resultado = pedidoService.adicionarItem(1L, 1L, 2);
-        
+
         // Then
         assertNotNull(resultado);
         assertEquals(1L, resultado.getId());
-        
+
         verify(pedidoService, times(1)).adicionarItem(1L, 1L, 2);
     }
 
@@ -362,10 +362,10 @@ class PedidoServiceTest {
     void testDeletarPedido_DeveChamarMetodoDeletar() {
         // Given
         doNothing().when(pedidoService).deletar(1L);
-        
+
         // When
         pedidoService.deletar(1L);
-        
+
         // Then
         verify(pedidoService, times(1)).deletar(1L);
     }

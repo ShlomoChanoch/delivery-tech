@@ -5,10 +5,10 @@ import lombok.Data;
 
 @Data
 public class LoginRequest {
-    
+
     @NotBlank(message = "Username é obrigatório")
     private String username;
-    
-    @NotBlank(message = "Password é obrigatório") 
+
+    @NotBlank(message = "Password é obrigatório")
     private String password;
 }
