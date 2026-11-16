@@ -160,6 +160,20 @@
     </configuration>
    </plugin>
    
+   <!-- Testes de integração (*IT.java): rodam em `mvn verify` (versão e goals herdados do parent) -->
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <executions>
+     <execution>
+      <goals>
+       <goal>integration-test</goal>
+       <goal>verify</goal>
+      </goals>
+     </execution>
+    </executions>
+   </plugin>
+
    <!-- JaCoCo Plugin para Cobertura de Testes -->
    <plugin>
     <groupId>org.jacoco</groupId>
