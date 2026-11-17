@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
+      lang="pt-BR"
       th:fragment="content(titulo, ativo, pagina)">
 <head>
     <meta charset="UTF-8">
@@ -12,23 +13,30 @@
     <link th:href="@{/css/painel.css}" rel="stylesheet">
 </head>
 <body>
+<a class="painel-skip" href="#conteudo">Pular para o conteúdo</a>
+
 <div class="painel">
     <aside class="painel-sidebar">
         <a class="painel-brand" th:href="@{/painel}">Delivery<span>Tech</span></a>
-        <nav>
-            <a class="painel-nav" th:classappend="${ativo == 'dashboard' ? 'active' : ''}"
+        <nav aria-label="Navegação do painel">
+            <a class="painel-nav" th:aria-current="${ativo == 'dashboard' ? 'page' : null}"
+               th:classappend="${ativo == 'dashboard' ? 'active' : ''}"
                th:href="@{/painel}">Dashboard</a>
-            <a class="painel-nav" th:classappend="${ativo == 'clientes' ? 'active' : ''}"
+            <a class="painel-nav" th:aria-current="${ativo == 'clientes' ? 'page' : null}"
+               th:classappend="${ativo == 'clientes' ? 'active' : ''}"
                th:href="@{/painel/clientes}">Clientes</a>
-            <a class="painel-nav" th:classappend="${ativo == 'produtos' ? 'active' : ''}"
+            <a class="painel-nav" th:aria-current="${ativo == 'produtos' ? 'page' : null}"
+               th:classappend="${ativo == 'produtos' ? 'active' : ''}"
                th:href="@{/painel/produtos}">Produtos</a>
-            <a class="painel-nav" th:classappend="${ativo == 'pedidos' ? 'active' : ''}"
+            <a class="painel-nav" th:aria-current="${ativo == 'pedidos' ? 'page' : null}"
+               th:classappend="${ativo == 'pedidos' ? 'active' : ''}"
                th:href="@{/painel/pedidos}">Pedidos</a>
-            <a class="painel-nav" th:classappend="${ativo == 'relatorios' ? 'active' : ''}"
+            <a class="painel-nav" th:aria-current="${ativo == 'relatorios' ? 'page' : null}"
+               th:classappend="${ativo == 'relatorios' ? 'active' : ''}"
                th:href="@{/painel/relatorios}">Relatórios</a>
         </nav>
         <div class="painel-sidebar-foot">
-            <a th:href="@{/swagger-ui/index.html}" target="_blank">API Swagger ↗</a>
+            <a th:href="@{/swagger-ui/index.html}" target="_blank" rel="noopener">API Swagger ↗</a>
         </div>
     </aside>
 
@@ -38,9 +46,9 @@
             <span class="painel-badge">acesso público</span>
         </header>
 
-        <main class="painel-content">
+        <div class="painel-content" id="conteudo" tabindex="-1">
             <th:block th:replace="${pagina}"/>
-        </main>
+        </div>
     </div>
 </div>
 </body>

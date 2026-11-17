@@ -43,6 +43,24 @@ body {
     color: var(--painel-accent);
 }
 
+/* Pular navegação: some fora do fluxo, aparece no foco do teclado */
+.painel-skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    padding: 0.6rem 1rem;
+    background: var(--painel-accent);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.painel-skip:focus {
+    left: 0.5rem;
+    top: 0.5rem;
+}
+
 .painel-sidebar nav {
     display: flex;
     flex-direction: column;
@@ -55,7 +73,6 @@ body {
     color: #d1d5db;
     text-decoration: none;
     font-size: 0.95rem;
-    border-left: 3px solid transparent;
 }
 
 .painel-nav:hover {
@@ -65,7 +82,6 @@ body {
 
 .painel-nav.active {
     background: var(--painel-sidebar-active);
-    border-left-color: var(--painel-accent);
     color: #fff;
     font-weight: 600;
 }
@@ -165,7 +181,7 @@ body {
 }
 
 .painel-chip.active {
-    background: var(--painel-accent);
+    background: #c2410c;
     color: #fff;
 }
 
@@ -207,6 +223,59 @@ body {
 .painel-status-CANCELADO {
     background: #fee2e2;
     color: #991b1b;
+}
+
+/* ---------- Superfícies do navegador ---------- */
+
+/* Anel de foco visível: laranja sobre a sidebar escura, laranja escuro sobre fundo claro */
+.painel-content :focus-visible,
+.painel-topbar :focus-visible {
+    outline: 2px solid #c2410c;
+    outline-offset: 2px;
+}
+
+.painel-sidebar :focus-visible {
+    outline: 2px solid var(--painel-accent);
+    outline-offset: -2px;
+}
+
+.painel-skip:focus-visible {
+    outline: 2px solid #111827;
+    outline-offset: 2px;
+}
+
+/* Cifras alinhadas em colunas de tabela */
+.painel-content table {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Barra de rolagem das tabelas, tema do painel */
+.table-responsive {
+    scrollbar-width: thin;
+    scrollbar-color: #9ca3af transparent;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 999px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+.painel-card-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
 }
 
 @media (max-width: 768px) {

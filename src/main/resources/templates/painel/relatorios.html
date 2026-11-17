@@ -6,7 +6,9 @@
     <div class="row g-3">
         <div class="col-lg-4">
             <div class="card painel-card h-100">
-                <div class="card-header painel-card-header">Vendas por restaurante</div>
+                <div class="card-header painel-card-header">
+                    <h2>Vendas por restaurante</h2>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
                         <thead>
@@ -37,8 +39,9 @@
         <div class="col-lg-4">
             <div class="card painel-card h-100">
                 <div class="card-header painel-card-header">
-                    Produtos mais vendidos
-                    <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
+                    <h2>Produtos mais vendidos
+                        <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
+                    </h2>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -70,8 +73,9 @@
         <div class="col-lg-4">
             <div class="card painel-card h-100">
                 <div class="card-header painel-card-header">
-                    Clientes mais ativos
-                    <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
+                    <h2>Clientes mais ativos
+                        <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
+                    </h2>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
