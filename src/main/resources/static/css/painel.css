@@ -1,0 +1,227 @@
+:root {
+    --painel-sidebar: #1f2937;
+    --painel-sidebar-active: #111827;
+    --painel-accent: #f97316;
+    --painel-bg: #f3f4f6;
+}
+
+body {
+    margin: 0;
+    background: var(--painel-bg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.painel {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+
+.painel-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--painel-sidebar);
+    color: #e5e7eb;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.painel-brand {
+    padding: 1.25rem 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+}
+
+.painel-brand span {
+    color: var(--painel-accent);
+}
+
+.painel-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
+    flex-grow: 1;
+}
+
+.painel-nav {
+    padding: 0.65rem 1rem;
+    color: #d1d5db;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+}
+
+.painel-nav:hover {
+    background: var(--painel-sidebar-active);
+    color: #fff;
+}
+
+.painel-nav.active {
+    background: var(--painel-sidebar-active);
+    border-left-color: var(--painel-accent);
+    color: #fff;
+    font-weight: 600;
+}
+
+.painel-sidebar-foot {
+    padding: 1rem;
+    font-size: 0.8rem;
+}
+
+.painel-sidebar-foot a {
+    color: #9ca3af;
+    text-decoration: none;
+}
+
+.painel-sidebar-foot a:hover {
+    color: #fff;
+}
+
+/* ---------- Main ---------- */
+
+.painel-main {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.painel-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.painel-topbar h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.painel-badge {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+}
+
+.painel-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+/* ---------- Cards ---------- */
+
+.painel-card {
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.painel-card-header {
+    background: #fff;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.painel-card-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+}
+
+.painel-card-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* ---------- Filtros / badges ---------- */
+
+.painel-chip {
+    background: #e5e7eb;
+    color: #374151;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.35rem 0.7rem;
+}
+
+.painel-chip:hover {
+    background: #d1d5db;
+    color: #111827;
+}
+
+.painel-chip.active {
+    background: var(--painel-accent);
+    color: #fff;
+}
+
+.painel-status {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.painel-status-CRIADO {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.painel-status-PENDENTE {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.painel-status-CONFIRMADO {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.painel-status-PREPARANDO {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.painel-status-SAIU_PARA_ENTREGA {
+    background: #cffafe;
+    color: #155e75;
+}
+
+.painel-status-ENTREGUE {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.painel-status-CANCELADO {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+@media (max-width: 768px) {
+    .painel {
+        flex-direction: column;
+    }
+
+    .painel-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+    }
+
+    .painel-sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}

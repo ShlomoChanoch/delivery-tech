@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: content('Clientes', 'clientes', ~{:: main})}">
+<body>
+<main>
+    <div class="card painel-card">
+        <div class="card-header painel-card-header d-flex flex-wrap align-items-center gap-2">
+            <span>Clientes</span>
+            <form class="d-flex gap-2 ms-auto" method="get" th:action="@{/painel/clientes}">
+                <input class="form-control form-control-sm" name="q" placeholder="Buscar por nome…"
+                       th:value="${q}" type="search">
+                <button class="btn btn-sm btn-primary" type="submit">Buscar</button>
+                <a class="btn btn-sm btn-outline-secondary" th:href="@{/painel/clientes}">Limpar</a>
+            </form>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Telefone</th>
+                    <th scope="col">Endereço</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cliente : ${clientes}">
+                    <td th:text="${cliente.id}">1</td>
+                    <td th:text="${cliente.nome}">Nome</td>
+                    <td th:text="${cliente.email}">email@example.com</td>
+                    <td th:text="${cliente.telefone}">00000000000</td>
+                    <td class="text-muted" th:text="${cliente.endereco}">Endereço</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(clientes)}">
+                    <td class="text-center text-muted py-4" colspan="5">
+                        Nenhum cliente encontrado.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted small">
+            <span th:text="${#lists.size(clientes)}">0</span> cliente(s) —
+            lista inicial mostra só ativos; a busca por nome varre todos.
+            Ex.: <a th:href="@{/painel/clientes(q='ana')}">?q=ana</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

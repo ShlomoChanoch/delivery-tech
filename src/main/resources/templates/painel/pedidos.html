@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: content('Pedidos', 'pedidos', ~{:: main})}">
+<body>
+<main>
+    <div class="card painel-card">
+        <div class="card-header painel-card-header d-flex flex-wrap align-items-center gap-2">
+            <span>Pedidos</span>
+            <div class="d-flex flex-wrap gap-1 ms-auto">
+                <a class="badge painel-chip"
+                   th:classappend="${status == '' ? 'active' : ''}"
+                   th:href="@{/painel/pedidos}">Todos</a>
+                <a class="badge painel-chip" th:each="s : ${statusValues}"
+                   th:classappend="${status == s.name() ? 'active' : ''}"
+                   th:href="@{/painel/pedidos(status=${s})}" th:text="${s.descricao}">Status</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Número</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Restaurante</th>
+                    <th scope="col">Data</th>
+                    <th scope="col" class="text-end">Valor</th>
+                    <th scope="col">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pedido : ${pedidos}">
+                    <td th:text="${pedido.id}">1</td>
+                    <td th:text="${pedido.numeroPedido}">—</td>
+                    <td th:text="${pedido.cliente != null ? pedido.cliente.nome : '—'}">Cliente</td>
+                    <td th:text="${pedido.restaurante != null ? pedido.restaurante.nome : '—'}">
+                        Restaurante
+                    </td>
+                    <td th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">
+                        00/00/0000 00:00
+                    </td>
+                    <td class="text-end"
+                        th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </td>
+                    <td>
+                        <span class="badge painel-status"
+                              th:classappend="'painel-status-' + ${pedido.status}"
+                              th:text="${pedido.status.descricao}">Status</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(pedidos)}">
+                    <td class="text-center text-muted py-4" colspan="7">
+                        Nenhum pedido encontrado.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted small">
+            <span th:text="${#lists.size(pedidos)}">0</span> pedido(s)
+            <span th:if="${status != ''}">
+                — filtro: <code th:text="'?status=' + ${status}">?status=</code>
+            </span>
+            · itens do pedido não são exibidos nesta listagem
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: content('Relatórios', 'relatorios', ~{:: main})}">
+<body>
+<main>
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card painel-card h-100">
+                <div class="card-header painel-card-header">Vendas por restaurante</div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col">Restaurante</th>
+                            <th scope="col" class="text-end">Pedidos</th>
+                            <th scope="col" class="text-end">Vendas</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${vendasPorRestaurante}">
+                            <td th:text="${row['restaurante']}">Restaurante</td>
+                            <td class="text-end" th:text="${row['quantidadePedidos']}">0</td>
+                            <td class="text-end"
+                                th:text="'R$ ' + ${#numbers.formatDecimal(row['totalVendas'], 1, 'POINT', 2, 'COMMA')}">
+                                R$ 0,00
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(vendasPorRestaurante)}">
+                            <td class="text-center text-muted py-3" colspan="3">Sem dados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card painel-card h-100">
+                <div class="card-header painel-card-header">
+                    Produtos mais vendidos
+                    <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col">Produto</th>
+                            <th scope="col" class="text-end">Qtd.</th>
+                            <th scope="col" class="text-end">Arrecadado</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${produtosMaisVendidos}">
+                            <td th:text="${row['produto']}">Produto</td>
+                            <td class="text-end" th:text="${row['quantidadeVendida']}">0</td>
+                            <td class="text-end"
+                                th:text="'R$ ' + ${#numbers.formatDecimal(row['totalArrecadado'], 1, 'POINT', 2, 'COMMA')}">
+                                R$ 0,00
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(produtosMaisVendidos)}">
+                            <td class="text-center text-muted py-3" colspan="3">Sem dados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card painel-card h-100">
+                <div class="card-header painel-card-header">
+                    Clientes mais ativos
+                    <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col">Cliente</th>
+                            <th scope="col" class="text-end">Pedidos</th>
+                            <th scope="col" class="text-end">Gasto</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${clientesAtivos}">
+                            <td th:text="${row['cliente']}">Cliente</td>
+                            <td class="text-end" th:text="${row['quantidadePedidos']}">0</td>
+                            <td class="text-end"
+                                th:text="'R$ ' + ${#numbers.formatDecimal(row['totalGasto'], 1, 'POINT', 2, 'COMMA')}">
+                                R$ 0,00
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(clientesAtivos)}">
+                            <td class="text-center text-muted py-3" colspan="3">Sem dados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-secondary mt-3 small mb-0">
+        Dados sem filtro de período (<code>dataInicio/dataFim = null</code>), limitados a
+        <span th:text="${limite}">10</span> linhas nos rankings. O mesmo conteúdo está disponível
+        via <a th:href="@{/api/relatorios/resumo-vendas}" target="_blank">API REST</a>.
+    </div>
+</main>
+</body>
+</html>
