@@ -1,8 +1,8 @@
 # 🚀 Delivery API
 
-API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção.
+API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (60 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado.
+> **Status atual:** ✅ `make test` verde (60 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console).
 
 ---
 
@@ -16,6 +16,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 - Relatórios de vendas, produtos mais vendidos e clientes ativos
 - Autenticação JWT e documentação OpenAPI/Swagger
 - Monitoramento e métricas via Actuator/Prometheus
+- Painel web público em Thymeleaf (`/painel`) — dashboard, clientes, produtos, pedidos e relatórios, sem login
 
 ---
 
@@ -67,6 +68,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 - [x] Build Docker multi-stage com imagem distroless + `docker-compose`
 - [x] Pipeline de CI/CD no GitHub Actions
 - [x] Scan de segurança com Trivy (`make scan`)
+- [x] Painel web público em Thymeleaf — 5 páginas (`/painel/**`, sem login), fragmentos nativos, Bootstrap 5 por CDN e CSS próprio
 
 ---
 
@@ -112,6 +114,44 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 **Resultado do ciclo:** `make lint` ✅ · `make test` ✅ (60 testes, 0 falhas) · `make scan` disponível para auditoria de segurança
 
 > **Nota sobre CVEs ignoradas:** o `.trivyignore` contém `CVE-2026-47884` (RCE via `XsltView`) e `CVE-2026-47890` (stream SSE com views). A correção só existe na linha 7.0.x (Spring Boot 4), e **esta API não usa XSLT nem SSE** — é REST/JSON puro —, portanto o risco não se aplica. A justificativa está documentada no próprio arquivo.
+
+---
+
+# 🖥️ Ciclo Recente: Painel Web Thymeleaf
+
+**Commits `3cf3633` → `9817660`** (nov/2026), conforme o plano acordado em `docs/handover-painel-thymeleaf.md`. O painel é **público** (sem login), serve as 5 páginas do domínio sobre os **mesmos services** da API — sem chamada HTTP interna e sem build de frontend.
+
+### 1️⃣ Implementação — `feat`
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `3cf3633` | `feat(web): adiciona painel Thymeleaf público com dashboard e relatórios` | `PainelController` (5 rotas), 5 templates + fragmento `fragments/layout.html`, `static/css/painel.css`, Bootstrap 5.3.3 por CDN, `permitAll /painel/**` no `SecurityConfig` |
+
+### 2️⃣ Correções de renderização — `fix`
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `b3c216b` | `fix(web): evita request de favicon no painel e quebra de linha em colunas de preço` | Favicon por data-URI no `<head>` (elimina o 403/500 a cada página) + `text-nowrap` em 5 `<td>` de preço |
+
+### 3️⃣ Acessibilidade e superfícies do navegador — `polish`
+| Commit | Mensagem | O que mudou |
+|---|---|---|
+| `9817660` | `polish(web): a11y e superfícies do navegador no painel (lang, main único, foco, contraste)` | `lang="pt-BR"`, `<main>` único (antes havia 2 aninhados), anéis de foco temados, chip ativo **2,80:1 → 5,18:1**, `aria-current`, skip link, hierarquia h1→h2, `tabular-nums`, scrollbar temada, `rel="noopener"`, `dl` do dashboard empilhando no mobile |
+
+### Verificação
+- **Playwright:** 5/5 páginas renderizando, **0 erros / 0 warnings** de console, 0 overflow horizontal (1440 / 768 / 375), navegação por clique (sidebar + chips de filtro) OK.
+- **Detector da skill `impeccable`:** `[]` (zero findings) · `make lint` ✅ · `make test` ✅ (60/60).
+
+> **Nota (favicon):** permitir `/favicon.ico` no SecurityConfig troca o 403 por **500**, porque `GlobalExceptionHandler` trata `NoResourceFoundException` como erro genérico (ver "Problemas conhecidos"). A solução adotada foi o `<link rel="icon">` data-URI — o navegador nem faz o request.
+
+---
+
+## ⚠️ Problemas conhecidos (pré-existentes, fora do escopo do painel)
+
+1. **Crash-loop a cada rebuild do container.** `DataLoader` não é idempotente e o H2 é file-based dentro do volume `delivery_h2_data`; ao recriar o container, os dados duplicam/sobrescrevem e o `DataLoader` falha em loop. **Workaround:**
+   ```bash
+   podman compose down && podman volume rm delivery_h2_data && podman compose up -d --build --force-recreate
+   ```
+2. **`GlobalExceptionHandler` devolve 500 para `NoResourceFoundException`** — qualquer path inexistente vira 500 em vez de 404. Afeta `/favicon.ico` e todos os assets não servidos.
+3. **`GET /api/relatorios/*` exige JWT** (403 sem token): o painel lê os relatórios direto do `RelatorioServiceImpl`, não pela API HTTP.
 
 ---
 
@@ -353,6 +393,9 @@ Existe cliente com email: true
 - [ ] Implementar `AuthService` (`login`, `register` e `getCurrentUser` ainda lançam `UnsupportedOperationException`)
 - [ ] Implementar `RelatorioServiceImpl` com dados reais (hoje retorna valores fixos)
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
+- [ ] Corrigir `DataLoader` para ser idempotente (hoje exige limpar o volume `delivery_h2_data` a cada rebuild)
+- [ ] Corrigir `GlobalExceptionHandler` para devolver 404 em `NoResourceFoundException` (hoje devolve 500)
+- [ ] Implementar estado de erro do painel (depende do item acima)
 
 ---
 
@@ -363,6 +406,7 @@ delivery-tech/
 ├── .trivyignore                     # CVEs justificadas (não aplicáveis a esta API)
 ├── Dockerfile                       # multi-stage: Maven/JDK 21 → distroless (nonroot)
 ├── docker-compose.yml               # API (:8080) + Adminer (:8083)
+├── docs/                            # handover do painel + diagrama (mermaid)
 ├── Makefile                         # atalhos: run, lint, format, test, scan, up...
 ├── pom.xml
 ├── scripts/                         # validate-tests.sh, deploy-local.sh, test-docker.sh
@@ -371,6 +415,7 @@ delivery-tech/
 │   │                                # ResponseCaptureFilter, OpenApiConfig, ModelMapperConfig
 │   ├── controller/                  # Auth, Cliente, Restaurante, Produto, Pedido,
 │   │                                # Relatorio e Health — 50 endpoints
+│   ├── controller/web/              # PainelController — rotas /painel/** (Thymeleaf)
 │   ├── dto/                         # request/ e response/
 │   ├── exception/                   # GlobalExceptionHandler
 │   ├── health/                      # Health indicators customizados
@@ -382,7 +427,9 @@ delivery-tech/
 │   ├── validation/                  # validadores (ex.: CEP)
 │   └── DeliveryApiApplication.java
 ├── src/main/resources/
-│   └── application.properties
+│   ├── application.properties
+│   ├── templates/                   # Thymeleaf: fragments/layout.html + painel/ (5 páginas)
+│   └── static/css/painel.css        # CSS próprio do painel
 └── src/test/java/                   # 4 classes *Test (unit) + 2 *IT (integração)
 ```
 
@@ -409,7 +456,12 @@ delivery-tech/
    - OpenAPI: `http://localhost:8080/api-docs`
    - Health: `http://localhost:8080/actuator/health`
 
-> **Autenticação:** `/api/auth/**`, `/health`, `/info`, `/actuator/**` e o Swagger são públicos. Todos os demais endpoints exigem token JWT — faça login em `POST /api/auth/login` e envie o cabeçalho `Authorization: Bearer <token>`.
+5. **Painel web (público, sem login):**
+   - Dashboard: `http://localhost:8080/painel`
+   - Demais páginas: `/painel/clientes`, `/painel/produtos`, `/painel/pedidos`, `/painel/relatorios`
+   - Filtros por query string (ex.: `/painel/clientes?q=ana`, `/painel/pedidos?status=CRIADO`)
+
+> **Autenticação:** `/api/auth/**`, `/health`, `/info`, `/actuator/**`, `/painel/**` e o Swagger são públicos. Todos os demais endpoints exigem token JWT — faça login em `POST /api/auth/login` e envie o cabeçalho `Authorization: Bearer <token>`.
 
 ### 🧰 Comandos úteis (Makefile)
 
@@ -447,5 +499,5 @@ make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCo
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (60 testes verdes), documentado (Swagger) e com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs e `make scan` (Trivy) disponível para auditoria —, com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (60 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
 
