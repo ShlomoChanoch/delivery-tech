@@ -37,7 +37,7 @@
                     <td>
                         <span class="badge painel-chip" th:text="${produto.categoria}">Categoria</span>
                     </td>
-                    <td class="text-end"
+                    <td class="text-end text-nowrap"
                         th:text="'R$ ' + ${#numbers.formatDecimal(produto.preco, 1, 'POINT', 2, 'COMMA')}">
                         R$ 0,00
                     </td>

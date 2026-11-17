@@ -39,7 +39,7 @@
                     <td th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">
                         00/00/0000 00:00
                     </td>
-                    <td class="text-end"
+                    <td class="text-end text-nowrap"
                         th:text="'R$ ' + ${#numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}">
                         R$ 0,00
                     </td>

@@ -20,7 +20,7 @@
                         <tr th:each="row : ${vendasPorRestaurante}">
                             <td th:text="${row['restaurante']}">Restaurante</td>
                             <td class="text-end" th:text="${row['quantidadePedidos']}">0</td>
-                            <td class="text-end"
+                            <td class="text-end text-nowrap"
                                 th:text="'R$ ' + ${#numbers.formatDecimal(row['totalVendas'], 1, 'POINT', 2, 'COMMA')}">
                                 R$ 0,00
                             </td>
@@ -53,7 +53,7 @@
                         <tr th:each="row : ${produtosMaisVendidos}">
                             <td th:text="${row['produto']}">Produto</td>
                             <td class="text-end" th:text="${row['quantidadeVendida']}">0</td>
-                            <td class="text-end"
+                            <td class="text-end text-nowrap"
                                 th:text="'R$ ' + ${#numbers.formatDecimal(row['totalArrecadado'], 1, 'POINT', 2, 'COMMA')}">
                                 R$ 0,00
                             </td>
@@ -86,7 +86,7 @@
                         <tr th:each="row : ${clientesAtivos}">
                             <td th:text="${row['cliente']}">Cliente</td>
                             <td class="text-end" th:text="${row['quantidadePedidos']}">0</td>
-                            <td class="text-end"
+                            <td class="text-end text-nowrap"
                                 th:text="'R$ ' + ${#numbers.formatDecimal(row['totalGasto'], 1, 'POINT', 2, 'COMMA')}">
                                 R$ 0,00
                             </td>
