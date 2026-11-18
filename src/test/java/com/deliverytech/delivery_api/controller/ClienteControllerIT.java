@@ -111,7 +111,7 @@ class ClienteControllerIT {
         // Given
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
-        // When & Then - resposta embrulhada em ApiResponseWrapper {success, data, message}
+        /* When & Then - resposta embrulhada em ApiResponseWrapper {success, data, message} */
         mockMvc.perform(
                         get("/api/clientes/{id}", clienteSalvo.getId())
                                 .accept(MediaType.APPLICATION_JSON))
@@ -202,7 +202,7 @@ class ClienteControllerIT {
         // Given
         Cliente clienteSalvo = clienteRepository.save(cliente);
 
-        // When & Then - esta rota responde {mensagem, cliente}, formato diferente de GET /{id}
+        /* When & Then - esta rota responde {mensagem, cliente}, formato diferente de GET /{id} */
         mockMvc.perform(patch("/api/clientes/{id}/status", clienteSalvo.getId()).with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cliente.id").value(clienteSalvo.getId()));

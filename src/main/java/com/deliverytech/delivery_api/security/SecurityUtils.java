@@ -1,6 +1,6 @@
 package com.deliverytech.delivery_api.security;
 
-// import com.deliverytech.delivery_api.entity.Usuario;
+/* import com.deliverytech.delivery_api.entity.Usuario; */
 import com.deliverytech.delivery_api.model.Usuario;
 import java.util.Optional;
 import org.springframework.security.core.Authentication;
