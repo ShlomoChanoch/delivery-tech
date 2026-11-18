@@ -482,7 +482,7 @@ delivery-tech/
 
 ```bash
 make up      # API em http://localhost:8080 e Adminer em http://localhost:8083
-make down    # para os containers (volumes preservados)
+make down    # para os containers e apaga o volume do H2 (delivery_h2_data)
 ```
 
 A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-Dspring.profiles.active=docker`.

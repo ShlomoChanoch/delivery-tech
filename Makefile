@@ -130,8 +130,10 @@ dev: up ## Sobe a stack, espera a API ficar pronta e mostra as URLs
 	@echo "📋 Para ver os logs:  make logs"
 	@echo "🛑 Para parar:        make down"
 
-down: check-compose ## Para e remove os containers (volumes são preservados)
+down: check-compose ## Para e remove os containers e o volume do H2
 	$(COMPOSE) down
+	@# TODO: remover quando descobrirmos como resetar o H2 sem apagar o volume toda vez.
+	@$(ENGINE) volume rm delivery_h2_data >/dev/null 2>&1 || true
 
 logs: check-compose ## Fica vendo os logs da API (Ctrl+C sai sem parar a API)
 	$(COMPOSE) logs -f delivery-api
