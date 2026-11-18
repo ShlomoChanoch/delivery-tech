@@ -54,6 +54,16 @@ public class PainelController {
         model.addAttribute("resumo", resumo);
         model.addAttribute("pedidosPeriodo", pedidosPeriodo);
         model.addAttribute("periodoDias", DIAS_DASHBOARD);
+        model.addAttribute("periodoInicio", inicio);
+        model.addAttribute("periodoFim", hoje);
+        model.addAttribute(
+                "vendasPorRestaurante", relatorioService.relatorioVendasPorRestaurante(null, null));
+        model.addAttribute(
+                "produtosMaisVendidos",
+                relatorioService.relatorioProdutosMaisVendidos(LIMITE_RELATORIO, null, null));
+        model.addAttribute(
+                "clientesMaisAtivos",
+                relatorioService.relatorioClientesAtivos(LIMITE_RELATORIO, null, null));
         return "painel/dashboard";
     }
 

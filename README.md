@@ -119,7 +119,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 
 # 🖥️ Ciclo Recente: Painel Web Thymeleaf
 
-**Commits `3cf3633` → `9817660`** (nov/2026), conforme o plano acordado em `docs/handover-painel-thymeleaf.md`. O painel é **público** (sem login), serve as 5 páginas do domínio sobre os **mesmos services** da API — sem chamada HTTP interna e sem build de frontend.
+**Commits `3cf3633` → `9817660`** (nov/2026). O painel é **público** (sem login), serve as 5 páginas do domínio sobre os **mesmos services** da API — sem chamada HTTP interna e sem build de frontend.
 
 ### 1️⃣ Implementação — `feat`
 | Commit | Mensagem | O que mudou |

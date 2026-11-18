@@ -3,80 +3,222 @@
       th:replace="~{fragments/layout :: content('Dashboard', 'dashboard', ~{:: main})}">
 <body>
 <main>
-    <div class="row g-3 mb-4">
-        <div class="col-sm-6 col-xl-3">
-            <div class="card painel-card h-100">
-                <div class="painel-card-label">Pedidos</div>
-                <div class="painel-card-value" th:text="${resumo['totalPedidos']}">0</div>
+    <div class="painel-kpis">
+        <article class="painel-kpi">
+            <div>
+                <div class="painel-kpi-label">Pedidos</div>
+                <div class="painel-kpi-value" th:text="${resumo['totalPedidos']}">0</div>
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="card painel-card h-100">
-                <div class="painel-card-label">Vendas (total)</div>
-                <div class="painel-card-value"
-                     th:text="'R$ ' + ${#numbers.formatDecimal(resumo['valorTotalVendas'], 1, 'POINT', 2, 'COMMA')}">
-                    R$ 0,00
+            <span class="painel-kpi-icon painel-tone-coral" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
+                    <path d="M8 8h8"/>
+                    <path d="M8 12h8"/>
+                    <path d="M8 16h5"/>
+                </svg>
+            </span>
+        </article>
+
+        <article class="painel-kpi">
+            <div>
+                <div class="painel-kpi-label">Vendas (total)</div>
+                <div class="painel-kpi-value">
+                    <small>R$</small>
+                    <span th:text="${#numbers.formatDecimal(resumo['valorTotalVendas'], 1, 'POINT', 2, 'COMMA')}">0,00</span>
                 </div>
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="card painel-card h-100">
-                <div class="painel-card-label">Ticket médio</div>
-                <div class="painel-card-value"
-                     th:text="'R$ ' + ${#numbers.formatDecimal(resumo['ticketMedio'], 1, 'POINT', 2, 'COMMA')}">
-                    R$ 0,00
+            <span class="painel-kpi-icon painel-tone-amber" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v3h-2.5a2 2 0 0 0 0 4H21v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/>
+                </svg>
+            </span>
+        </article>
+
+        <article class="painel-kpi">
+            <div>
+                <div class="painel-kpi-label">Ticket médio</div>
+                <div class="painel-kpi-value">
+                    <small>R$</small>
+                    <span th:text="${#numbers.formatDecimal(resumo['ticketMedio'], 1, 'POINT', 2, 'COMMA')}">0,00</span>
                 </div>
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="card painel-card h-100">
-                <div class="painel-card-label">Clientes ativos</div>
-                <div class="painel-card-value" th:text="${resumo['clientesAtivos']}">0</div>
+            <span class="painel-kpi-icon painel-tone-violet" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42Z"/>
+                    <circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"/>
+                </svg>
+            </span>
+        </article>
+
+        <article class="painel-kpi">
+            <div>
+                <div class="painel-kpi-label">Clientes ativos</div>
+                <div class="painel-kpi-value" th:text="${resumo['clientesAtivos']}">0</div>
             </div>
-        </div>
+            <span class="painel-kpi-icon painel-tone-green" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </span>
+        </article>
     </div>
 
-    <div class="row g-3">
-        <div class="col-lg-7">
-            <div class="card painel-card">
-                <div class="card-header painel-card-header">
-                    <h2>Pedidos no período
-                        <span class="text-muted small"
-                              th:text="'últimos ' + ${periodoDias} + ' dias'"></span>
-                    </h2>
+    <section class="painel-split">
+        <article class="painel-card">
+            <div class="painel-card-head">
+                <div>
+                    <h2 class="painel-card-title">Pedidos no período</h2>
+                    <p class="painel-card-sub">Últimos <span th:text="${periodoDias}">30</span> dias, agrupados por dia</p>
                 </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-12 col-sm-5">Período</dt>
-                        <dd class="col-12 col-sm-7" th:text="${pedidosPeriodo['periodo']}">—</dd>
-                        <dt class="col-12 col-sm-5">Total de pedidos</dt>
-                        <dd class="col-12 col-sm-7"
-                            th:text="${pedidosPeriodo['totalPedidos']}">0</dd>
-                        <dt class="col-12 col-sm-5">Valor total</dt>
-                        <dd class="col-12 col-sm-7"
-                            th:text="'R$ ' + ${#numbers.formatDecimal(pedidosPeriodo['valorTotal'], 1, 'POINT', 2, 'COMMA')}">
-                            R$ 0,00
-                        </dd>
-                        <dt class="col-12 col-sm-5">Agrupamento</dt>
-                        <dd class="col-12 col-sm-7" th:text="${pedidosPeriodo['agrupamento']}">dia</dd>
-                    </dl>
+                <span class="painel-pill"><span th:text="${periodoDias}">30</span> dias</span>
+            </div>
+
+            <div class="painel-period">
+                <div class="painel-period-number">
+                    <span th:text="${pedidosPeriodo['totalPedidos']}">0</span>
+                    <em th:text="|pedidos entre ${#temporals.format(periodoInicio, 'dd/MM/yyyy')} e ${#temporals.format(periodoFim, 'dd/MM/yyyy')}|">
+                        pedidos entre 00/00/0000 e 00/00/0000
+                    </em>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-5">
-            <div class="card painel-card h-100">
-                <div class="card-header painel-card-header">
-                    <h2>Restaurantes ativos</h2>
+
+            <dl class="painel-facts">
+                <div>
+                    <dt>Valor total</dt>
+                    <dd th:text="'R$ ' + ${#numbers.formatDecimal(pedidosPeriodo['valorTotal'], 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </dd>
                 </div>
-                <div class="card-body d-flex align-items-center">
-                    <div class="painel-card-value me-3"
-                         th:text="${resumo['restaurantesAtivos']}">0
+                <div>
+                    <dt>Agrupamento</dt>
+                    <dd class="text-capitalize" th:text="${pedidosPeriodo['agrupamento']}">dia</dd>
+                </div>
+                <div>
+                    <dt>Ticket médio</dt>
+                    <dd th:text="'R$ ' + ${#numbers.formatDecimal(resumo['ticketMedio'], 1, 'POINT', 2, 'COMMA')}">
+                        R$ 0,00
+                    </dd>
+                </div>
+            </dl>
+        </article>
+
+        <article class="painel-card d-flex flex-column">
+            <div class="painel-card-head">
+                <div>
+                    <h2 class="painel-card-title">Restaurantes ativos</h2>
+                    <p class="painel-card-sub">Cadastrados e ativos na base</p>
+                </div>
+            </div>
+
+            <div class="painel-figure" th:text="${resumo['restaurantesAtivos']}">0</div>
+            <p class="painel-figure-copy">restaurantes com cardápio disponível para novos pedidos.</p>
+
+            <p class="painel-card-sub mt-auto pt-4 mb-0">
+                Sem filtro de período neste indicador.
+            </p>
+        </article>
+    </section>
+
+    <section class="painel-ranks">
+        <article class="painel-card">
+            <div class="painel-card-head">
+                <div>
+                    <h2 class="painel-card-title">Vendas por restaurante</h2>
+                    <p class="painel-card-sub">Dados de amostra</p>
+                </div>
+            </div>
+
+            <ul class="painel-rank-list">
+                <li class="painel-rank-row" th:each="row : ${vendasPorRestaurante}">
+                    <div class="painel-rank-line">
+                        <span class="painel-rank-name" th:text="${row['restaurante']}">Restaurante</span>
+                        <span class="painel-rank-meta">
+                            <span th:text="${row['quantidadePedidos']} + ' ped.'">0 ped.</span> ·
+                            <span th:text="'R$ ' + ${#numbers.formatDecimal(row['totalVendas'], 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+                        </span>
                     </div>
-                    <span class="text-muted">restaurantes cadastrados e ativos na base</span>
+                    <div class="painel-bar" aria-hidden="true">
+                        <span th:style="${vendasPorRestaurante[0]['quantidadePedidos'] > 0
+                            ? 'width:' + (row['quantidadePedidos'] * 100 / vendasPorRestaurante[0]['quantidadePedidos']) + '%'
+                            : 'width:0%'}"></span>
+                    </div>
+                </li>
+                <li th:if="${#lists.isEmpty(vendasPorRestaurante)}" class="painel-card-sub">
+                    Sem dados.
+                </li>
+            </ul>
+        </article>
+
+        <article class="painel-card">
+            <div class="painel-card-head">
+                <div>
+                    <h2 class="painel-card-title">Produtos mais vendidos</h2>
+                    <p class="painel-card-sub">Dados de amostra</p>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <ul class="painel-rank-list">
+                <li class="painel-rank-row" th:each="row : ${produtosMaisVendidos}">
+                    <div class="painel-rank-line">
+                        <span class="painel-rank-name" th:text="${row['produto']}">Produto</span>
+                        <span class="painel-rank-meta">
+                            <span th:text="${row['quantidadeVendida']} + ' un.'">0 un.</span> ·
+                            <span th:text="'R$ ' + ${#numbers.formatDecimal(row['totalArrecadado'], 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+                        </span>
+                    </div>
+                    <div class="painel-bar painel-bar-violet" aria-hidden="true">
+                        <span th:style="${produtosMaisVendidos[0]['quantidadeVendida'] > 0
+                            ? 'width:' + (row['quantidadeVendida'] * 100 / produtosMaisVendidos[0]['quantidadeVendida']) + '%'
+                            : 'width:0%'}"></span>
+                    </div>
+                </li>
+                <li th:if="${#lists.isEmpty(produtosMaisVendidos)}" class="painel-card-sub">
+                    Sem dados.
+                </li>
+            </ul>
+        </article>
+
+        <article class="painel-card">
+            <div class="painel-card-head">
+                <div>
+                    <h2 class="painel-card-title">Clientes mais ativos</h2>
+                    <p class="painel-card-sub">Dados de amostra</p>
+                </div>
+            </div>
+
+            <ul class="painel-rank-list">
+                <li class="painel-rank-row" th:each="row : ${clientesMaisAtivos}">
+                    <div class="painel-rank-line">
+                        <span class="painel-rank-name" th:text="${row['cliente']}">Cliente</span>
+                        <span class="painel-rank-meta">
+                            <span th:text="${row['quantidadePedidos']} + ' ped.'">0 ped.</span> ·
+                            <span th:text="'R$ ' + ${#numbers.formatDecimal(row['totalGasto'], 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+                        </span>
+                    </div>
+                    <div class="painel-bar" aria-hidden="true">
+                        <span th:style="${clientesMaisAtivos[0]['quantidadePedidos'] > 0
+                            ? 'width:' + (row['quantidadePedidos'] * 100 / clientesMaisAtivos[0]['quantidadePedidos']) + '%'
+                            : 'width:0%'}"></span>
+                    </div>
+                </li>
+                <li th:if="${#lists.isEmpty(clientesMaisAtivos)}" class="painel-card-sub">
+                    Sem dados.
+                </li>
+            </ul>
+        </article>
+    </section>
+
+    <p class="painel-note">
+        <span>Relatórios sem filtro de período, limitados a 10 linhas.</span>
+        <a th:href="@{/painel/relatorios}">Ver relatórios completos</a>
+    </p>
 </main>
 </body>
 </html>

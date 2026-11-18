@@ -4,11 +4,22 @@
 <body>
 <main>
     <div class="card painel-card">
-        <div class="card-header painel-card-header d-flex flex-wrap align-items-center gap-2">
-            <h2>Clientes</h2>
-            <form class="d-flex gap-2 ms-auto" method="get" th:action="@{/painel/clientes}">
-                <input class="form-control form-control-sm" name="q" placeholder="Buscar por nome…"
-                       th:value="${q}" type="search">
+        <div class="card-header painel-card-header d-flex flex-wrap align-items-center gap-3">
+            <div>
+                <h2>Clientes ativos</h2>
+                <p class="painel-card-sub mb-0">Lista inicial mostra só ativos; a busca por nome varre todos.</p>
+            </div>
+            <form class="painel-filters ms-auto" method="get" th:action="@{/painel/clientes}" role="search">
+                <div class="painel-search-field">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="m20 20-3.5-3.5"/>
+                    </svg>
+                    <label class="visually-hidden" for="busca-cliente">Buscar cliente por nome</label>
+                    <input class="form-control form-control-sm" id="busca-cliente" name="q"
+                           placeholder="Buscar por nome" th:value="${q}" type="search">
+                </div>
                 <button class="btn btn-sm btn-primary" type="submit">Buscar</button>
                 <a class="btn btn-sm btn-outline-secondary" th:href="@{/painel/clientes}">Limpar</a>
             </form>
@@ -27,12 +38,12 @@
                 <tbody>
                 <tr th:each="cliente : ${clientes}">
                     <td th:text="${cliente.id}">1</td>
-                    <td th:text="${cliente.nome}">Nome</td>
+                    <td><span class="painel-strong" th:text="${cliente.nome}">Nome</span></td>
                     <td th:text="${cliente.email}">email@example.com</td>
-                    <td th:text="${cliente.telefone}">00000000000</td>
+                    <td class="text-nowrap" th:text="${cliente.telefone}">00000000000</td>
                     <td class="text-muted" th:text="${cliente.endereco}">Endereço</td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(clientes)}">
+                <tr class="painel-empty" th:if="${#lists.isEmpty(clientes)}">
                     <td class="text-center text-muted py-4" colspan="5">
                         Nenhum cliente encontrado.
                     </td>
@@ -40,9 +51,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer text-muted small">
-            <span th:text="${#lists.size(clientes)}">0</span> cliente(s) —
-            lista inicial mostra só ativos; a busca por nome varre todos.
+        <div class="card-footer">
+            <span th:text="${#lists.size(clientes)}">0</span> cliente(s) ·
+            busca por nome varre todos, inclusive inativos.
             Ex.: <a th:href="@{/painel/clientes(q='ana')}">?q=ana</a>
         </div>
     </div>

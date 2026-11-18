@@ -8,6 +8,7 @@
             <div class="card painel-card h-100">
                 <div class="card-header painel-card-header">
                     <h2>Vendas por restaurante</h2>
+                    <p class="painel-card-sub mb-0">Ranking sem filtro de período</p>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -27,7 +28,7 @@
                                 R$ 0,00
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(vendasPorRestaurante)}">
+                        <tr class="painel-empty" th:if="${#lists.isEmpty(vendasPorRestaurante)}">
                             <td class="text-center text-muted py-3" colspan="3">Sem dados.</td>
                         </tr>
                         </tbody>
@@ -39,9 +40,8 @@
         <div class="col-lg-4">
             <div class="card painel-card h-100">
                 <div class="card-header painel-card-header">
-                    <h2>Produtos mais vendidos
-                        <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
-                    </h2>
+                    <h2>Produtos mais vendidos</h2>
+                    <p class="painel-card-sub mb-0">Top <span th:text="${limite}">10</span> · sem filtro de período</p>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -61,7 +61,7 @@
                                 R$ 0,00
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(produtosMaisVendidos)}">
+                        <tr class="painel-empty" th:if="${#lists.isEmpty(produtosMaisVendidos)}">
                             <td class="text-center text-muted py-3" colspan="3">Sem dados.</td>
                         </tr>
                         </tbody>
@@ -73,9 +73,8 @@
         <div class="col-lg-4">
             <div class="card painel-card h-100">
                 <div class="card-header painel-card-header">
-                    <h2>Clientes mais ativos
-                        <span class="text-muted small" th:text="'top ' + ${limite}">top 10</span>
-                    </h2>
+                    <h2>Clientes mais ativos</h2>
+                    <p class="painel-card-sub mb-0">Top <span th:text="${limite}">10</span> · sem filtro de período</p>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -95,7 +94,7 @@
                                 R$ 0,00
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(clientesAtivos)}">
+                        <tr class="painel-empty" th:if="${#lists.isEmpty(clientesAtivos)}">
                             <td class="text-center text-muted py-3" colspan="3">Sem dados.</td>
                         </tr>
                         </tbody>
@@ -105,10 +104,11 @@
         </div>
     </div>
 
-    <div class="alert alert-secondary mt-3 small mb-0">
-        Dados sem filtro de período (<code>dataInicio/dataFim = null</code>), limitados a
+    <div class="alert mb-0 small">
+        Dados de amostra para demonstração, sem filtro de período
+        (<code>dataInicio/dataFim = null</code>) e limitados a
         <span th:text="${limite}">10</span> linhas nos rankings. O mesmo conteúdo está disponível
-        via <a th:href="@{/api/relatorios/resumo-vendas}" target="_blank">API REST</a>.
+        via <a th:href="@{/api/relatorios/resumo-vendas}" target="_blank" rel="noopener">API REST</a>.
     </div>
 </main>
 </body>

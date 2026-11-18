@@ -4,9 +4,12 @@
 <body>
 <main>
     <div class="card painel-card">
-        <div class="card-header painel-card-header d-flex flex-wrap align-items-center gap-2">
-            <h2>Produtos</h2>
-            <div class="d-flex flex-wrap gap-1 ms-auto">
+        <div class="card-header painel-card-header">
+            <div>
+                <h2>Catálogo de produtos</h2>
+                <p class="painel-card-sub mb-0">Filtre o catálogo por categoria.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-1 mt-3">
                 <a class="badge painel-chip"
                    th:classappend="${categoria == '' ? 'active' : ''}"
                    th:href="@{/painel/produtos}">Todas</a>
@@ -31,7 +34,7 @@
                 <tr th:each="produto : ${produtos}">
                     <td th:text="${produto.id}">1</td>
                     <td>
-                        <span th:text="${produto.nome}">Produto</span>
+                        <span class="painel-strong" th:text="${produto.nome}">Produto</span>
                         <div class="small text-muted" th:text="${produto.descricao}">Descrição</div>
                     </td>
                     <td>
@@ -50,7 +53,7 @@
                               th:text="${produto.ativo ? 'Sim' : 'Não'}">Sim</span>
                     </td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(produtos)}">
+                <tr class="painel-empty" th:if="${#lists.isEmpty(produtos)}">
                     <td class="text-center text-muted py-4" colspan="6">
                         Nenhum produto nesta categoria.
                     </td>
@@ -58,10 +61,10 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer text-muted small">
+        <div class="card-footer">
             <span th:text="${#lists.size(produtos)}">0</span> produto(s)
             <span th:if="${categoria != ''}">
-                — filtro: <code th:text="'?categoria=' + ${categoria}">?categoria=</code>
+                · filtro: <code th:text="'?categoria=' + ${categoria}">?categoria=</code>
             </span>
         </div>
     </div>

@@ -4,9 +4,12 @@
 <body>
 <main>
     <div class="card painel-card">
-        <div class="card-header painel-card-header d-flex flex-wrap align-items-center gap-2">
-            <h2>Pedidos</h2>
-            <div class="d-flex flex-wrap gap-1 ms-auto">
+        <div class="card-header painel-card-header">
+            <div>
+                <h2>Lista de pedidos</h2>
+                <p class="painel-card-sub mb-0">Filtre a lista por status do pedido.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-1 mt-3">
                 <a class="badge painel-chip"
                    th:classappend="${status == '' ? 'active' : ''}"
                    th:href="@{/painel/pedidos}">Todos</a>
@@ -31,12 +34,12 @@
                 <tbody>
                 <tr th:each="pedido : ${pedidos}">
                     <td th:text="${pedido.id}">1</td>
-                    <td th:text="${pedido.numeroPedido}">—</td>
+                    <td class="text-nowrap" th:text="${pedido.numeroPedido}">—</td>
                     <td th:text="${pedido.cliente != null ? pedido.cliente.nome : '—'}">Cliente</td>
                     <td th:text="${pedido.restaurante != null ? pedido.restaurante.nome : '—'}">
                         Restaurante
                     </td>
-                    <td th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">
+                    <td class="text-nowrap" th:text="${#temporals.format(pedido.dataPedido, 'dd/MM/yyyy HH:mm')}">
                         00/00/0000 00:00
                     </td>
                     <td class="text-end text-nowrap"
@@ -49,7 +52,7 @@
                               th:text="${pedido.status.descricao}">Status</span>
                     </td>
                 </tr>
-                <tr th:if="${#lists.isEmpty(pedidos)}">
+                <tr class="painel-empty" th:if="${#lists.isEmpty(pedidos)}">
                     <td class="text-center text-muted py-4" colspan="7">
                         Nenhum pedido encontrado.
                     </td>
@@ -57,10 +60,10 @@
                 </tbody>
             </table>
         </div>
-        <div class="card-footer text-muted small">
+        <div class="card-footer">
             <span th:text="${#lists.size(pedidos)}">0</span> pedido(s)
             <span th:if="${status != ''}">
-                — filtro: <code th:text="'?status=' + ${status}">?status=</code>
+                · filtro: <code th:text="'?status=' + ${status}">?status=</code>
             </span>
             · itens do pedido não são exibidos nesta listagem
         </div>
