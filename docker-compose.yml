@@ -63,7 +63,9 @@ services:
     restart: unless-stopped
     
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      # Distroless não tem shell/wget/curl: a sonda é o HealthCheck.class
+      # compilado no estágio de build do Dockerfile (docker/HealthCheck.java).
+      test: ["CMD", "/usr/bin/java", "-Xmx64m", "-cp", "/app/health", "HealthCheck", "http://127.0.0.1:8080/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3

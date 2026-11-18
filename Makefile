@@ -116,7 +116,7 @@ scan: check-engine check-trivy ## Trivy (config + vulnerabilidades + segredos); 
 		--severity HIGH,CRITICAL --ignore-unfixed $(IMAGE_NAME):$(IMAGE_TAG)
 
 up: check-compose ## Sobe a stack (API + Adminer) e só retorna quando pronta
-	$(COMPOSE) up -d --build --wait
+	$(COMPOSE) up -d --build --wait --wait-timeout 180
 
 down: check-compose ## Para e remove os containers e o volume do H2
 	$(COMPOSE) down
