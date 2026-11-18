@@ -441,9 +441,9 @@ delivery-tech/
 
 2. **Rode a aplicação:**
    ```bash
-   make run          # ou: ./mvnw spring-boot:run
+   make dev          # ou: ./mvnw spring-boot:run
    ```
-   A API sobe em `http://localhost:8080`.
+   A API sobe em `http://localhost:8080` (foreground — **Ctrl+C** para parar).
 
 3. **Acesse o H2 Console:**
    - URL: `http://localhost:8080/h2-console`
@@ -467,7 +467,7 @@ delivery-tech/
 
 | Comando | Descrição |
 |---|---|
-| `make run` | Sobe a API na porta 8080 |
+| `make dev` | Sobe API + painel local (porta 8080), Ctrl+C para |
 | `make lint` | Checagem de formatação (Spotless) |
 | `make format` | Corrige a formatação automaticamente |
 | `make test` | Testes (`mvn verify`) + cobertura JaCoCo |
@@ -475,13 +475,18 @@ delivery-tech/
 | `make package` | Gera o `.jar` em `target/` (sem rodar testes de novo) |
 | `make build` | Build da imagem Docker/Podman |
 | `make scan` | Trivy: config + vulnerabilidades + segredos |
-| `make up` / `make down` / `make logs` | Sobe, dura e acompanha a stack (API + Adminer) |
+| `make up` / `make down` / `make logs` | Sobe, derruba e acompanha a stack em container (API + Adminer) |
+| `make smoke` | Valida o build em container: sobe, checa endpoints e derruba |
 | `make ci-local` | `lint` + `test` + `build` + `scan` antes do push |
 
 ### 🐳 Docker
 
+Fluxo para **validar o build e o profile `docker`** — não para edição diária: cada mudança
+em `src/` rebuilda o Maven dentro da imagem (minutos). Para editar, use `make dev`.
+
 ```bash
-make up      # API em http://localhost:8080 e Adminer em http://localhost:8083
+make up      # API em http://localhost:8080 e Adminer em http://localhost:8083 (retorna quando healthy)
+make smoke   # sobe, checa /actuator/health, /painel e /api-docs, derruba
 make down    # para os containers e apaga o volume do H2 (delivery_h2_data)
 ```
 
