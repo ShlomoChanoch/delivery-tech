@@ -1,19 +1,23 @@
 package com.deliverytech.delivery_api.health;
 
 import com.deliverytech.delivery_api.repository.ClienteRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 @Component("client")
+@RequiredArgsConstructor
 public class ClientHealthIndicator implements HealthIndicator {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHealthIndicator.class);
 
-    @Autowired private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
 
     @Override
     public Health health() {
