@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -71,7 +72,7 @@ public class ResponseCaptureFilter implements Filter {
 
             // ✅ Gerar nome do arquivo
             String timestamp =
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                    LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String method = request.getMethod();
             String endpoint = request.getRequestURI().replace("/api/", "").replace("/", "_");
 
@@ -95,7 +96,7 @@ public class ResponseCaptureFilter implements Filter {
             content.append("=== ENTREGA - TESTE DE ENDPOINT ===\n");
             content.append("Data/Hora: ")
                     .append(
-                            LocalDateTime.now()
+                            LocalDateTime.now(ZoneId.systemDefault())
                                     .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
                     .append("\n");
             content.append("Método: ").append(method).append("\n");

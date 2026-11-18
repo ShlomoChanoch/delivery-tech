@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import lombok.Data;
 
@@ -35,7 +36,7 @@ public class ErrorResponse {
 
     public ErrorResponse(
             int status, String error, String message, String path, Map<String, String> details) {
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneId.systemDefault());
         this.status = status;
         this.error = error;
         this.message = message;

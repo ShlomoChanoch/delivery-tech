@@ -2,6 +2,7 @@ package com.deliverytech.delivery_api.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException ex) {
 
         Map<String, Object> errors = new HashMap<>();
-        errors.put("timestamp", LocalDateTime.now());
+        errors.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
         errors.put("status", HttpStatus.BAD_REQUEST.value());
         errors.put("error", "Dados inválidos");
 
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex) {
 
         Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
+        error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
         error.put("status", HttpStatus.BAD_REQUEST.value());
         error.put("error", "Requisição inválida");
         error.put("message", ex.getMessage());
@@ -60,7 +61,7 @@ public class GlobalExceptionHandler {
         if (ex.getMessage().contains("não encontrado") || ex.getMessage().contains("not found")) {
 
             Map<String, Object> error = new HashMap<>();
-            error.put("timestamp", LocalDateTime.now());
+            error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
             error.put("status", HttpStatus.NOT_FOUND.value());
             error.put("error", "Recurso não encontrado");
             error.put("message", ex.getMessage());
@@ -79,7 +80,7 @@ public class GlobalExceptionHandler {
             ConstraintViolationException ex) {
 
         Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
+        error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
         error.put("status", HttpStatus.BAD_REQUEST.value());
         error.put("error", "Violação de restrição");
         error.put("message", ex.getMessage());
@@ -93,7 +94,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
 
         Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
+        error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
         error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         error.put("error", "Erro interno do servidor");
         error.put("message", "Ocorreu um erro inesperado");

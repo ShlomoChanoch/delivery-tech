@@ -1,6 +1,7 @@
 package com.deliverytech.delivery_api.controller;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +15,7 @@ public class HealthController {
                 "status",
                 "UP",
                 "timestamp",
-                LocalDateTime.now().toString(),
+                LocalDateTime.now(ZoneId.systemDefault()).toString(),
                 "service",
                 "Delivery API",
                 "javaVersion",

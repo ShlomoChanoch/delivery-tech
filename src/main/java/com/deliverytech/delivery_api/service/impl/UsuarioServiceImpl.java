@@ -12,6 +12,7 @@ import com.deliverytech.delivery_api.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -105,7 +106,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setEmail(registerRequest.getEmail());
         usuario.setSenha(passwordEncoder.encode(registerRequest.getSenha()));
         usuario.setAtivo(true);
-        usuario.setDataCriacao(LocalDateTime.now());
+        usuario.setDataCriacao(LocalDateTime.now(ZoneId.systemDefault()));
 
         if (registerRequest.getRole() == null) {
             usuario.setRole(Role.USER); // valor padrão

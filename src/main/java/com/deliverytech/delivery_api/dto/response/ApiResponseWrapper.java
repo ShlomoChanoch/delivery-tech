@@ -2,6 +2,7 @@ package com.deliverytech.delivery_api.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Schema(description = "Wrapper para encapsular resposta da API", title = "Api Response Wrapper")
 public class ApiResponseWrapper<T> {
@@ -20,7 +21,7 @@ public class ApiResponseWrapper<T> {
         this.success = success;
         this.data = data;
         this.message = message;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneId.systemDefault());
     }
 
     public static <T> ApiResponseWrapper<T> success(T data, String message) {

@@ -3,6 +3,7 @@ package com.deliverytech.delivery_api.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.*;
 
 @Entity
@@ -25,7 +26,7 @@ public class Cliente {
 
     @Builder.Default private Boolean ativo = true;
 
-    @Builder.Default private LocalDateTime dataCriacao = LocalDateTime.now();
+    @Builder.Default private LocalDateTime dataCriacao = LocalDateTime.now(ZoneId.systemDefault());
 
     // IMPLEMENTAR APENAS O MÉTODO PERSONALIZADO
     @JsonIgnore

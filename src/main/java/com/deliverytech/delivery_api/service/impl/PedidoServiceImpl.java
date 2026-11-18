@@ -8,6 +8,7 @@ import com.deliverytech.delivery_api.service.PedidoService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public class PedidoServiceImpl implements PedidoService {
     public Pedido criar(Pedido pedido) {
         // ✅ SIMPLIFICAR: Definir dados básicos do pedido
         pedido.setStatus(StatusPedido.CRIADO); // ✅ USAR CRIADO ao invés de PENDENTE
-        pedido.setDataPedido(LocalDateTime.now());
+        pedido.setDataPedido(LocalDateTime.now(ZoneId.systemDefault()));
         pedido.setValorTotal(BigDecimal.ZERO); // ✅ Iniciar com valor zero
 
         // ✅ SALVAR e retornar o pedido

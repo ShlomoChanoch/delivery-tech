@@ -3,6 +3,7 @@ package com.deliverytech.delivery_api.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.*;
 
@@ -34,7 +35,7 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
 
-    @Builder.Default private LocalDateTime dataPedido = LocalDateTime.now();
+    @Builder.Default private LocalDateTime dataPedido = LocalDateTime.now(ZoneId.systemDefault());
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ItemPedido> itens;

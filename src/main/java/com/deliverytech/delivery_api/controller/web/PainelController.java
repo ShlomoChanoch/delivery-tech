@@ -9,6 +9,7 @@ import com.deliverytech.delivery_api.service.PedidoService;
 import com.deliverytech.delivery_api.service.ProdutoService;
 import com.deliverytech.delivery_api.service.RelatorioService;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,8 @@ public class PainelController {
     @GetMapping
     @Transactional(readOnly = true)
     public String dashboard(Model model) {
-        LocalDate hoje = LocalDate.now();
+        // java:S8688 — a zona precisa ser explícita: sem ela o "hoje" muda conforme o host
+        LocalDate hoje = LocalDate.now(ZoneId.systemDefault());
         LocalDate inicio = hoje.minusDays(DIAS_DASHBOARD);
 
         Map<String, Object> resumo = relatorioService.resumoVendas(null, null);
