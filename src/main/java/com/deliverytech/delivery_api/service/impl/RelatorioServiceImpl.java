@@ -122,7 +122,8 @@ public class RelatorioServiceImpl implements RelatorioService {
         // A API exige as datas e o painel sempre passa a janela de 30 dias; a normalização
         // cobre o caso degenerado de ambos nulos (vira a janela inteira).
         Object[] agregado =
-                pedidoRepository.contarVendasPorPeriodo(inicio(dataInicio), fim(dataFim));
+                primeiraLinha(
+                        pedidoRepository.contarVendasPorPeriodo(inicio(dataInicio), fim(dataFim)));
         long totalPedidos = asLong(agregado[0]);
 
         return Map.of(
@@ -136,10 +137,11 @@ public class RelatorioServiceImpl implements RelatorioService {
 
     @Override
     public Map<String, Object> resumoVendas(LocalDate dataInicio, LocalDate dataFim) {
-        Object[] agregado =
+        List<Object[]> linhas =
                 isSemPeriodo(dataInicio, dataFim)
                         ? pedidoRepository.contarVendasGeral()
                         : pedidoRepository.contarVendasPorPeriodo(inicio(dataInicio), fim(dataFim));
+        Object[] agregado = primeiraLinha(linhas);
         long totalPedidos = asLong(agregado[0]);
         BigDecimal valorTotalVendas = asDecimal(agregado[1]);
         BigDecimal ticketMedio =
@@ -159,6 +161,14 @@ public class RelatorioServiceImpl implements RelatorioService {
     /** Período ausente de verdade = nenhuma das duas datas informadas. */
     private static boolean isSemPeriodo(LocalDate dataInicio, LocalDate dataFim) {
         return dataInicio == null && dataFim == null;
+    }
+
+    /**
+     * Agregado sem GROUP BY devolve sempre uma linha (COUNT nunca é vazio); a lista vazia só
+     * ocorreria em cenário anômalo — aí responde zeros em vez de estourar índice.
+     */
+    private static Object[] primeiraLinha(List<Object[]> linhas) {
+        return linhas.isEmpty() ? new Object[] {0L, BigDecimal.ZERO} : linhas.get(0);
     }
 
     /** Início inclusivo: {@code data >= inicio.atStartOfDay()}. */

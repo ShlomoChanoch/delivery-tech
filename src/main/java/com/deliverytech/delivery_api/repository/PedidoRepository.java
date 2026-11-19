@@ -74,11 +74,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     // === AGREGADOS DOS RELATÓRIOS (RelatorioServiceImpl) ===
 
     /**
-     * Contagem e soma de TODOS os pedidos. Retorna Object[]: [0] totalPedidos (Long), [1]
-     * valorTotal (BigDecimal — COALESCE para não virar null sem pedidos).
+     * Contagem e soma de TODOS os pedidos. Retorna uma lista com uma única linha: [0] totalPedidos
+     * (Long), [1] valorTotal (BigDecimal — COALESCE para não virar null sem pedidos). O tipo {@code
+     * List} é obrigatório: com {@code Object[]} cru o Spring Data envolveria a linha num array de
+     * linhas e o acesso aos índices quebraria.
      */
     @Query("SELECT COUNT(p), COALESCE(SUM(p.valorTotal), 0) FROM Pedido p")
-    Object[] contarVendasGeral();
+    List<Object[]> contarVendasGeral();
 
     /**
      * Contagem e soma de pedidos na janela [inicio, fim). Mesmo formato de {@link
@@ -87,6 +89,6 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     @Query(
             "SELECT COUNT(p), COALESCE(SUM(p.valorTotal), 0) FROM Pedido p "
                     + "WHERE p.dataPedido >= :inicio AND p.dataPedido < :fim")
-    Object[] contarVendasPorPeriodo(
+    List<Object[]> contarVendasPorPeriodo(
             @Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 }

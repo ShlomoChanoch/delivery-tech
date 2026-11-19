@@ -3,15 +3,30 @@ package com.deliverytech.delivery_api.config;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+/**
+ * Semeia dados de demonstração na base (clientes, restaurantes, produtos e pedidos). Desligado no
+ * profile de teste via {@code app.data-loader.enabled=false} (ver application-test.properties) — os
+ * ITs criam e limpam a própria massa e a presença destes dados quebraria os {@code deleteAll()} por
+ * FK.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        name = "app.data-loader.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class DataLoader implements CommandLineRunner {
 
     private final ClienteRepository clienteRepository;
@@ -20,6 +35,8 @@ public class DataLoader implements CommandLineRunner {
 
     private final ProdutoRepository produtoRepository;
 
+    private final PedidoRepository pedidoRepository;
+
     @Override
     public void run(String... args) throws Exception {
         log.info("=== INICIANDO CARGA DE DADOS DE TESTE ===");
@@ -27,6 +44,7 @@ public class DataLoader implements CommandLineRunner {
         // Inserir dados de teste (sem limpar dados existentes)
         inserirClientes();
         inserirRestaurantes();
+        inserirPedidos();
 
         log.info("=== CARGA DE DADOS CONCLUÍDA ===");
 
@@ -246,4 +264,129 @@ public class DataLoader implements CommandLineRunner {
                         produto8, produto9, produto10));
         log.info("✓ 10 produtos inseridos");
     }
+
+    /**
+     * Semeia pedidos de demonstração para o painel e os relatórios terem dado real (sem isto, o
+     * RelatorioServiceImpl devolveria zeros e o dashboard regrediria). Guarda de idempotência: só
+     * insere se não houver nenhum pedido — evita que ESTE bloco duplique dado a cada rebuild do
+     * container (o fix completo de idempotência do DataLoader é item separado da agenda).
+     */
+    private void inserirPedidos() {
+        if (pedidoRepository.count() > 0) {
+            log.info("--- Pedidos já existentes: seed de pedidos ignorado ---");
+            return;
+        }
+
+        log.info("--- Inserindo Pedidos ---");
+
+        var clientes = new ArrayList<>(clienteRepository.findAll());
+        var restaurantes = new ArrayList<>(restauranteRepository.findAll());
+        var produtos = new ArrayList<>(produtoRepository.findAll());
+        if (clientes.isEmpty() || restaurantes.isEmpty() || produtos.isEmpty()) {
+            log.warn(
+                    "--- Base vazia (clientes/restaurantes/produtos): seed de pedidos ignorado ---");
+            return;
+        }
+        clientes.sort(Comparator.comparing(Cliente::getId));
+        restaurantes.sort(Comparator.comparing(Restaurante::getId));
+        produtos.sort(Comparator.comparing(Produto::getId));
+
+        // Distribuição propositalmente desigual: clientes com nº diferente de pedidos, vendedores
+        // e produtos com quantidades diferentes — senão ORDER BY e as barras do dashboard não
+        // têm forma. Todos os pedidos caem na janela de 30 dias do dashboard (até 28 dias).
+        List<PedidoSeed> plano =
+                List.of(
+                        new PedidoSeed(0, 0, 2, StatusPedido.ENTREGUE, new int[] {0, 2, 1, 1}),
+                        new PedidoSeed(0, 0, 7, StatusPedido.ENTREGUE, new int[] {1, 2}),
+                        new PedidoSeed(0, 2, 14, StatusPedido.ENTREGUE, new int[] {0, 3, 1, 1}),
+                        new PedidoSeed(0, 3, 21, StatusPedido.CONFIRMADO, new int[] {0, 1, 1, 2}),
+                        new PedidoSeed(0, 4, 28, StatusPedido.ENTREGUE, new int[] {0, 1}),
+                        new PedidoSeed(1, 0, 4, StatusPedido.ENTREGUE, new int[] {1, 2}),
+                        new PedidoSeed(1, 2, 12, StatusPedido.ENTREGUE, new int[] {0, 2}),
+                        new PedidoSeed(1, 4, 25, StatusPedido.ENTREGUE, new int[] {0, 1, 1, 1}),
+                        new PedidoSeed(2, 1, 9, StatusPedido.ENTREGUE, new int[] {0, 1, 1, 1}),
+                        new PedidoSeed(2, 3, 18, StatusPedido.CONFIRMADO, new int[] {0, 2}),
+                        new PedidoSeed(3, 2, 6, StatusPedido.SAIU_PARA_ENTREGA, new int[] {1, 1}),
+                        new PedidoSeed(4, 0, 16, StatusPedido.ENTREGUE, new int[] {0, 1}));
+
+        LocalDateTime agora = LocalDateTime.now();
+        int sequencia = 0;
+        for (PedidoSeed seed : plano) {
+            if (seed.cliente() >= clientes.size() || seed.restaurante() >= restaurantes.size()) {
+                continue;
+            }
+            Cliente cliente = clientes.get(seed.cliente());
+            Restaurante restaurante = restaurantes.get(seed.restaurante());
+
+            // Itens sempre do cardápio do restaurante do pedido (índices locais, com fallback)
+            List<Produto> cardapio =
+                    produtos.stream()
+                            .filter(p ->
+                                    p.getRestaurante() != null
+                                            && p.getRestaurante()
+                                                    .getId()
+                                                    .equals(restaurante.getId()))
+                            .sorted(Comparator.comparing(Produto::getId))
+                            .toList();
+            if (cardapio.isEmpty()) {
+                continue;
+            }
+
+            List<ItemPedido> itens = new ArrayList<>();
+            BigDecimal valorTotal = BigDecimal.ZERO;
+            for (int i = 0; i < seed.itens().length; i += 2) {
+                Produto produto = cardapio.get(Math.min(seed.itens()[i], cardapio.size() - 1));
+                int quantidade = seed.itens()[i + 1];
+                ItemPedido item =
+                        ItemPedido.builder()
+                                .produto(produto)
+                                .quantidade(quantidade)
+                                .precoUnitario(produto.getPreco())
+                                .build();
+                item.setSubtotal();
+                itens.add(item);
+                // Consistência: total do pedido = soma dos subtotais (o que os dois rankings
+                // somam por caminhos diferentes — divergência apareceria na cara dura)
+                valorTotal = valorTotal.add(item.getSubtotal());
+            }
+
+            sequencia++;
+            Pedido pedido =
+                    Pedido.builder()
+                            .cliente(cliente)
+                            .restaurante(restaurante)
+                            .status(seed.status())
+                            .dataPedido(
+                                    agora.minusDays(seed.diasAtras()).minusMinutes(sequencia * 17))
+                            .numeroPedido(String.format("PED-%04d", sequencia))
+                            .valorTotal(valorTotal)
+                            .subtotal(valorTotal)
+                            .observacoes("Pedido de demonstração")
+                            .enderecoEntrega(montarEndereco(cliente))
+                            .itens(itens)
+                            .build();
+            itens.forEach(item -> item.setPedido(pedido));
+            pedidoRepository.save(pedido);
+        }
+        log.info("✓ {} pedidos inseridos (últimos 30 dias)", sequencia);
+    }
+
+    private static Endereco montarEndereco(Cliente cliente) {
+        return Endereco.builder()
+                .rua(cliente.getEndereco())
+                .cidade("São Paulo")
+                .estado("SP")
+                .build();
+    }
+
+    /**
+     * Linha do plano de seed de pedidos. {@code itens} é uma lista plana de pares
+     * [índiceLocalDoProduto, quantidade] no cardápio do restaurante do pedido.
+     *
+     * @param cliente índice em clientes (ordenado por id)
+     * @param restaurante índice em restaurantes (ordenado por id)
+     * @param diasAtras dias até a data do pedido (janela de 30 dias do dashboard)
+     */
+    private record PedidoSeed(
+            int cliente, int restaurante, int diasAtras, StatusPedido status, int[] itens) {}
 }
