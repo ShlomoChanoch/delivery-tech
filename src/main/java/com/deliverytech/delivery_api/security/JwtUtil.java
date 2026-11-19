@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,16 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private Long expiration;
+
+    /**
+     * Falha cedo na subida se JWT_SECRET estiver ausente/inválido: precisa ser Base64URL de pelo
+     * menos 32 bytes (RFC 7518 §3.2 para HMAC-SHA). Sem isto, o erro só apareceria no primeiro
+     * login — e uma chave fraca passaria despercebida.
+     */
+    @PostConstruct
+    void validarConfiguracao() {
+        Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
+    }
 
     // Gera um token JWT para o usuário
     public String gerarToken(String email) {

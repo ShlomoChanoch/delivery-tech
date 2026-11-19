@@ -43,8 +43,9 @@ services:
       SPRING_SECURITY_USER_NAME: admin
       SPRING_SECURITY_USER_PASSWORD: admin123
       
-      # JWT
-      JWT_SECRET: my-secret-keyQWERTYUIOPASDFGHJKLZXCVBNMQWERTY1-DOCKER
+      # JWT — obrigatório: defina JWT_SECRET no .env (Base64URL, >= 32 bytes).
+      # Gere com: openssl rand -base64 32 | tr '+/' '-_' | tr -d '='
+      JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env — veja .env.example}
       JWT_EXPIRATION: 86400000
       
       # Logging

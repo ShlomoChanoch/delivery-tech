@@ -32,6 +32,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Segredos locais — nunca commitar valores reais ###
+.env
+.env.*
+!.env.example
 .bmad-loop/runs/
 .bmad-loop/cache/
 .bmad-loop/policy.toml
