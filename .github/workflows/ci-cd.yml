@@ -26,11 +26,21 @@ jobs:
       - name: Build do projeto (jar)
         run: mvn clean package -DskipTests
 
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build imagem Docker
-        run: docker build -t delivery-tech:latest .
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          push: false
+          tags: delivery-tech:latest
+          secrets: |
+            jwt_secret=${{ secrets.JWT_SECRET }}
 
       - name: Rodar container para testes de integração
-        run: docker run -d --name delivery-tech-test -p 8080:8080 delivery-tech:latest
+        run: docker run -d --name delivery-tech-test -p 8080:8080 -e JWT_SECRET=${{ secrets.JWT_SECRET }} delivery-tech:latest
 
       - name: Esperar aplicação subir
         run: |
