@@ -395,14 +395,21 @@ public class DataLoader implements CommandLineRunner {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof PedidoSeed other)) {
+            if (!(obj
+                    instanceof
+                    PedidoSeed(
+                            int outroCliente,
+                            int outroRestaurante,
+                            int outroDiasAtras,
+                            StatusPedido outroStatus,
+                            int[] outrosItens))) {
                 return false;
             }
-            return cliente == other.cliente
-                    && restaurante == other.restaurante
-                    && diasAtras == other.diasAtras
-                    && status == other.status
-                    && Arrays.equals(itens, other.itens);
+            return cliente == outroCliente
+                    && restaurante == outroRestaurante
+                    && diasAtras == outroDiasAtras
+                    && status == outroStatus
+                    && Arrays.equals(itens, outrosItens);
         }
 
         @Override
