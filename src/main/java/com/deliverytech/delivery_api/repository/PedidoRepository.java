@@ -70,4 +70,23 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     /** Buscar pedidos até uma data */
     List<Pedido> findByDataPedidoLessThanEqual(LocalDateTime data);
+
+    // === AGREGADOS DOS RELATÓRIOS (RelatorioServiceImpl) ===
+
+    /**
+     * Contagem e soma de TODOS os pedidos. Retorna Object[]: [0] totalPedidos (Long), [1]
+     * valorTotal (BigDecimal — COALESCE para não virar null sem pedidos).
+     */
+    @Query("SELECT COUNT(p), COALESCE(SUM(p.valorTotal), 0) FROM Pedido p")
+    Object[] contarVendasGeral();
+
+    /**
+     * Contagem e soma de pedidos na janela [inicio, fim). Mesmo formato de {@link
+     * #contarVendasGeral()}.
+     */
+    @Query(
+            "SELECT COUNT(p), COALESCE(SUM(p.valorTotal), 0) FROM Pedido p "
+                    + "WHERE p.dataPedido >= :inicio AND p.dataPedido < :fim")
+    Object[] contarVendasPorPeriodo(
+            @Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 }
