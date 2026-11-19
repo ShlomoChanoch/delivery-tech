@@ -2,7 +2,7 @@
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (60 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console).
+> **Status atual:** ✅ `make test` verde (102 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console).
 
 ---
 
@@ -43,7 +43,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 ## 📈 Status do Projeto
 
 ✅ **Funcional e verificado**  
-> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (36 unitários + 24 de integração).
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (75 unitários + 27 de integração).
 
 ---
 
@@ -385,13 +385,13 @@ Existe cliente com email: true
 - [x] Criar controllers para expor as consultas customizadas via REST API (`RelatorioController`)
 - [x] Adicionar validações nos modelos (Bean Validation)
 - [x] Configurar Swagger/OpenAPI para documentação da API
-- [x] Implementar testes unitários e de integração (60 testes)
-- [ ] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
+- [x] Implementar testes unitários e de integração (102 testes)
+- [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [ ] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação
 - [ ] Trocar o H2 em memória por MySQL em homologação/produção
 - [ ] Mover `jwt.secret` para variável de ambiente (hoje está hardcoded no `application.properties`)
 - [ ] Implementar `AuthService` (`login`, `register` e `getCurrentUser` ainda lançam `UnsupportedOperationException`)
-- [ ] Implementar `RelatorioServiceImpl` com dados reais (hoje retorna valores fixos)
+- [x] Implementar `RelatorioServiceImpl` com dados reais (era valores fixos; agora consulta os repositories)
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
 - [ ] Corrigir `DataLoader` para ser idempotente (hoje exige limpar o volume `delivery_h2_data` a cada rebuild)
 - [ ] Corrigir `GlobalExceptionHandler` para devolver 404 em `NoResourceFoundException` (hoje devolve 500)
@@ -498,11 +498,11 @@ A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-D
 make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCoCo)
 ```
 
-- **36 testes unitários** em 4 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `DeliveryApiApplicationTests`
-- **24 testes de integração** em `ClienteControllerIT` e `PedidoControllerIT` (executados pelo Failsafe no `mvn verify`)
+- **75 testes unitários** em 8 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `RelatorioServiceImplTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
+- **27 testes de integração** em `ClienteControllerIT`, `PedidoControllerIT` e `PainelRelatoriosIT` (executados pelo Failsafe no `mvn verify`)
 - Relatório de cobertura: `make coverage`
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (60 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (102 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
 
