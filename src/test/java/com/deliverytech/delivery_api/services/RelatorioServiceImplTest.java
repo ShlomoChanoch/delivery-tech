@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,7 +51,7 @@ class RelatorioServiceImplTest {
     @Test
     @DisplayName("Vendas por restaurante: sem período usa a variante geral e devolve o contrato")
     void vendasPorRestaurante_SemPeriodo_VarianteGeral() {
-        RelatorioVendas linha = org.mockito.Mockito.mock(RelatorioVendas.class);
+        RelatorioVendas linha = mock(RelatorioVendas.class);
         when(linha.getNomeRestaurante()).thenReturn("Pizza Express");
         when(linha.getQuantidadePedidos()).thenReturn(4L);
         when(linha.getTotalVendas()).thenReturn(new BigDecimal("227.20"));
@@ -89,7 +89,7 @@ class RelatorioServiceImplTest {
     @Test
     @DisplayName("Vendas por restaurante: null-guards (SUM null vira ZERO, nome null vira '')")
     void vendasPorRestaurante_NulGuards() {
-        RelatorioVendas linha = org.mockito.Mockito.mock(RelatorioVendas.class);
+        RelatorioVendas linha = mock(RelatorioVendas.class);
         when(restauranteRepository.relatorioVendasPorRestaurante()).thenReturn(List.of(linha));
 
         List<Map<String, Object>> resultado = service.relatorioVendasPorRestaurante(null, null);
@@ -131,9 +131,9 @@ class RelatorioServiceImplTest {
 
         verify(produtoRepository)
                 .produtosMaisVendidosPorPeriodo(
-                        eq(5),
-                        eq(LocalDateTime.of(2026, 11, 1, 0, 0)),
-                        eq(LocalDateTime.of(2026, 11, 20, 0, 0)));
+                        5,
+                        LocalDateTime.of(2026, 11, 1, 0, 0),
+                        LocalDateTime.of(2026, 11, 20, 0, 0));
     }
 
     @Test
@@ -181,9 +181,9 @@ class RelatorioServiceImplTest {
 
         verify(clienteRepository)
                 .rankingClientesPorPedidosPorPeriodo(
-                        eq(10),
-                        eq(LocalDateTime.of(2026, 11, 1, 0, 0)),
-                        eq(LocalDateTime.of(2026, 11, 20, 0, 0)));
+                        10,
+                        LocalDateTime.of(2026, 11, 1, 0, 0),
+                        LocalDateTime.of(2026, 11, 20, 0, 0));
     }
 
     // === relatorioPedidosPorPeriodo ===

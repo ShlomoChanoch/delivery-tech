@@ -4,6 +4,7 @@ import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -309,7 +310,7 @@ public class DataLoader implements CommandLineRunner {
                         new PedidoSeed(3, 2, 6, StatusPedido.SAIU_PARA_ENTREGA, new int[] {1, 1}),
                         new PedidoSeed(4, 0, 16, StatusPedido.ENTREGUE, new int[] {0, 1}));
 
-        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime agora = LocalDateTime.now(ZoneId.systemDefault());
         int sequencia = 0;
         for (PedidoSeed seed : plano) {
             if (seed.cliente() >= clientes.size() || seed.restaurante() >= restaurantes.size()) {
@@ -328,45 +329,44 @@ public class DataLoader implements CommandLineRunner {
                                                     .equals(restaurante.getId()))
                             .sorted(Comparator.comparing(Produto::getId))
                             .toList();
-            if (cardapio.isEmpty()) {
-                continue;
-            }
+            if (!cardapio.isEmpty()) {
+                List<ItemPedido> itens = new ArrayList<>();
+                BigDecimal valorTotal = BigDecimal.ZERO;
+                for (int i = 0; i < seed.itens().length; i += 2) {
+                    Produto produto = cardapio.get(Math.min(seed.itens()[i], cardapio.size() - 1));
+                    int quantidade = seed.itens()[i + 1];
+                    ItemPedido item =
+                            ItemPedido.builder()
+                                    .produto(produto)
+                                    .quantidade(quantidade)
+                                    .precoUnitario(produto.getPreco())
+                                    .build();
+                    item.setSubtotal();
+                    itens.add(item);
+                    // Consistência: total do pedido = soma dos subtotais (o que os dois rankings
+                    // somam por caminhos diferentes — divergência apareceria na cara dura)
+                    valorTotal = valorTotal.add(item.getSubtotal());
+                }
 
-            List<ItemPedido> itens = new ArrayList<>();
-            BigDecimal valorTotal = BigDecimal.ZERO;
-            for (int i = 0; i < seed.itens().length; i += 2) {
-                Produto produto = cardapio.get(Math.min(seed.itens()[i], cardapio.size() - 1));
-                int quantidade = seed.itens()[i + 1];
-                ItemPedido item =
-                        ItemPedido.builder()
-                                .produto(produto)
-                                .quantidade(quantidade)
-                                .precoUnitario(produto.getPreco())
+                sequencia++;
+                Pedido pedido =
+                        Pedido.builder()
+                                .cliente(cliente)
+                                .restaurante(restaurante)
+                                .status(seed.status())
+                                .dataPedido(
+                                        agora.minusDays(seed.diasAtras())
+                                                .minusMinutes((long) sequencia * 17))
+                                .numeroPedido(String.format("PED-%04d", sequencia))
+                                .valorTotal(valorTotal)
+                                .subtotal(valorTotal)
+                                .observacoes("Pedido de demonstração")
+                                .enderecoEntrega(montarEndereco(cliente))
+                                .itens(itens)
                                 .build();
-                item.setSubtotal();
-                itens.add(item);
-                // Consistência: total do pedido = soma dos subtotais (o que os dois rankings
-                // somam por caminhos diferentes — divergência apareceria na cara dura)
-                valorTotal = valorTotal.add(item.getSubtotal());
+                itens.forEach(item -> item.setPedido(pedido));
+                pedidoRepository.save(pedido);
             }
-
-            sequencia++;
-            Pedido pedido =
-                    Pedido.builder()
-                            .cliente(cliente)
-                            .restaurante(restaurante)
-                            .status(seed.status())
-                            .dataPedido(
-                                    agora.minusDays(seed.diasAtras()).minusMinutes(sequencia * 17))
-                            .numeroPedido(String.format("PED-%04d", sequencia))
-                            .valorTotal(valorTotal)
-                            .subtotal(valorTotal)
-                            .observacoes("Pedido de demonstração")
-                            .enderecoEntrega(montarEndereco(cliente))
-                            .itens(itens)
-                            .build();
-            itens.forEach(item -> item.setPedido(pedido));
-            pedidoRepository.save(pedido);
         }
         log.info("✓ {} pedidos inseridos (últimos 30 dias)", sequencia);
     }
@@ -388,5 +388,45 @@ public class DataLoader implements CommandLineRunner {
      * @param diasAtras dias até a data do pedido (janela de 30 dias do dashboard)
      */
     private record PedidoSeed(
-            int cliente, int restaurante, int diasAtras, StatusPedido status, int[] itens) {}
+            int cliente, int restaurante, int diasAtras, StatusPedido status, int[] itens) {
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof PedidoSeed other)) {
+                return false;
+            }
+            return cliente == other.cliente
+                    && restaurante == other.restaurante
+                    && diasAtras == other.diasAtras
+                    && status == other.status
+                    && Arrays.equals(itens, other.itens);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Integer.hashCode(cliente);
+            result = 31 * result + Integer.hashCode(restaurante);
+            result = 31 * result + Integer.hashCode(diasAtras);
+            result = 31 * result + (status == null ? 0 : status.hashCode());
+            return 31 * result + Arrays.hashCode(itens);
+        }
+
+        @Override
+        public String toString() {
+            return "PedidoSeed[cliente="
+                    + cliente
+                    + ", restaurante="
+                    + restaurante
+                    + ", diasAtras="
+                    + diasAtras
+                    + ", status="
+                    + status
+                    + ", itens="
+                    + Arrays.toString(itens)
+                    + "]";
+        }
+    }
 }
