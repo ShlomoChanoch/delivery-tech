@@ -2,7 +2,7 @@
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (102 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console).
+> **Status atual:** ✅ `make test` verde (111 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
 
 ---
 
@@ -43,7 +43,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 ## 📈 Status do Projeto
 
 ✅ **Funcional e verificado**  
-> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (75 unitários + 27 de integração).
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (84 unitários + 27 de integração).
 
 ---
 
@@ -389,7 +389,7 @@ Existe cliente com email: true
 - [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [ ] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação
 - [ ] Trocar o H2 em memória por MySQL em homologação/produção
-- [ ] Mover `jwt.secret` para variável de ambiente (hoje está hardcoded no `application.properties`)
+- [x] Mover `jwt.secret` para variável de ambiente — **feito (19/11, commit `bb0552b`)**: `jwt.secret=${JWT_SECRET}` sem fallback; `JwtUtil` valida a chave na subida (Base64URL ≥ 256 bits); compose exige `JWT_SECRET` via `.env`; chave antiga rotacionada e tratada como comprometida
 - [ ] Implementar `AuthService` (`login`, `register` e `getCurrentUser` ainda lançam `UnsupportedOperationException`)
 - [x] Implementar `RelatorioServiceImpl` com dados reais (era valores fixos; agora consulta os repositories)
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
@@ -439,24 +439,33 @@ delivery-tech/
 
 1. **Clone o repositório** (requisitos: **JDK 21** e Maven — o wrapper `./mvnw` é incluído)
 
-2. **Rode a aplicação:**
+2. **Configure o segredo JWT** (obrigatório — a aplicação não sobe sem ele):
    ```bash
-   make dev          # ou: ./mvnw spring-boot:run
+   cp .env.example .env
+   # gere uma chave Base64URL de >= 32 bytes e cole em JWT_SECRET no .env:
+   openssl rand -base64 32 | tr '+/' '-_' | tr -d '='
+   ```
+   O `.env` é local e nunca versionado (`.gitignore`). Para rodar fora do compose,
+   exporte a variável: `export JWT_SECRET=***
+
+3. **Rode a aplicação:**
+   ```bash
+   make dev          # ou: ./mvnw spring-boot:run (com JWT_SECRET no ambiente)
    ```
    A API sobe em `http://localhost:8080` (foreground — **Ctrl+C** para parar).
 
-3. **Acesse o H2 Console:**
+4. **Acesse o H2 Console:**
    - URL: `http://localhost:8080/h2-console`
    - JDBC URL: `jdbc:h2:mem:delivery`
    - Username: `sa`
    - Password: (deixar em branco)
 
-4. **Documentação da API:**
+5. **Documentação da API:**
    - Swagger UI: `http://localhost:8080/swagger-ui.html`
    - OpenAPI: `http://localhost:8080/api-docs`
    - Health: `http://localhost:8080/actuator/health`
 
-5. **Painel web (público, sem login):**
+6. **Painel web (público, sem login):**
    - Dashboard: `http://localhost:8080/painel`
    - Demais páginas: `/painel/clientes`, `/painel/produtos`, `/painel/pedidos`, `/painel/relatorios`
    - Filtros por query string (ex.: `/painel/clientes?q=ana`, `/painel/pedidos?status=CRIADO`)
@@ -485,6 +494,7 @@ Fluxo para **validar o build e o profile `docker`** — não para edição diár
 em `src/` rebuilda o Maven dentro da imagem (minutos). Para editar, use `make dev`.
 
 ```bash
+# JWT_SECRET precisa estar no .env (o compose falha sem ele — veja .env.example)
 make up      # API em http://localhost:8080 e Adminer em http://localhost:8083 (retorna quando healthy)
 make smoke   # sobe, checa /actuator/health, /painel e /api-docs, derruba
 make down    # para os containers e apaga o volume do H2 (delivery_h2_data)
@@ -498,11 +508,11 @@ A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-D
 make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCoCo)
 ```
 
-- **75 testes unitários** em 8 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `RelatorioServiceImplTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
+- **84 testes unitários** em 10 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `RelatorioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
 - **27 testes de integração** em `ClienteControllerIT`, `PedidoControllerIT` e `PainelRelatoriosIT` (executados pelo Failsafe no `mvn verify`)
 - Relatório de cobertura: `make coverage`
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (102 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (111 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
 
