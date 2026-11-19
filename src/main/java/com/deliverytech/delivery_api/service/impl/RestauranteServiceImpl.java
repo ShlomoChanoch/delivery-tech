@@ -28,10 +28,8 @@ public class RestauranteServiceImpl implements RestauranteService {
         Restaurante restaurante = new Restaurante();
         restaurante.setNome(restauranteRequest.getNome());
         restaurante.setCategoria(restauranteRequest.getCategoria());
-        /*         restaurante.setEndereco(restauranteRequest.getEndereco()); */
         restaurante.setTaxaEntrega(restauranteRequest.getTaxaEntrega());
         restaurante.setTelefone(restauranteRequest.getTelefone());
-        /*         restaurante.setEmail(restauranteRequest.getEmail()); */
         restaurante.setTempoEntregaMinutos(restauranteRequest.getTempoEntregaMinutos());
         restaurante.setAtivo(true);
 

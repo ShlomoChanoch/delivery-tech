@@ -72,7 +72,8 @@ public class ResponseCaptureFilter implements Filter {
 
             // ✅ Gerar nome do arquivo
             String timestamp =
-                    LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                    LocalDateTime.now(ZoneId.systemDefault())
+                            .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String method = request.getMethod();
             String endpoint = request.getRequestURI().replace("/api/", "").replace("/", "_");
 

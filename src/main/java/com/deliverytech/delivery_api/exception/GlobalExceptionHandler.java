@@ -17,15 +17,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String TIMESTAMP = "timestamp";
+    private static final String STATUS = "status";
+    private static final String ERROR = "error";
+    private static final String MESSAGE = "message";
+
     /** Tratamento para validações de Bean Validation (@NotBlank, @Email, etc.) */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
 
         Map<String, Object> errors = new HashMap<>();
-        errors.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
-        errors.put("status", HttpStatus.BAD_REQUEST.value());
-        errors.put("error", "Dados inválidos");
+        errors.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
+        errors.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        errors.put(ERROR, "Dados inválidos");
 
         Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult()
@@ -44,10 +49,10 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex) {
 
         Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
-        error.put("status", HttpStatus.BAD_REQUEST.value());
-        error.put("error", "Requisição inválida");
-        error.put("message", ex.getMessage());
+        error.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
+        error.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        error.put(ERROR, "Requisição inválida");
+        error.put(MESSAGE, ex.getMessage());
 
         log.warn("Erro de argumento ilegal: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(error);
@@ -61,10 +66,10 @@ public class GlobalExceptionHandler {
         if (ex.getMessage().contains("não encontrado") || ex.getMessage().contains("not found")) {
 
             Map<String, Object> error = new HashMap<>();
-            error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
-            error.put("status", HttpStatus.NOT_FOUND.value());
-            error.put("error", "Recurso não encontrado");
-            error.put("message", ex.getMessage());
+            error.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
+            error.put(STATUS, HttpStatus.NOT_FOUND.value());
+            error.put(ERROR, "Recurso não encontrado");
+            error.put(MESSAGE, ex.getMessage());
 
             log.warn("Recurso não encontrado: {}", ex.getMessage());
             return ResponseEntity.notFound().build();
@@ -80,10 +85,10 @@ public class GlobalExceptionHandler {
             ConstraintViolationException ex) {
 
         Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
-        error.put("status", HttpStatus.BAD_REQUEST.value());
-        error.put("error", "Violação de restrição");
-        error.put("message", ex.getMessage());
+        error.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
+        error.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        error.put(ERROR, "Violação de restrição");
+        error.put(MESSAGE, ex.getMessage());
 
         log.warn("Violação de constraint: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(error);
@@ -94,10 +99,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
 
         Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now(ZoneId.systemDefault()));
-        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        error.put("error", "Erro interno do servidor");
-        error.put("message", "Ocorreu um erro inesperado");
+        error.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
+        error.put(STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        error.put(ERROR, "Erro interno do servidor");
+        error.put(MESSAGE, "Ocorreu um erro inesperado");
 
         log.error("Erro interno: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);

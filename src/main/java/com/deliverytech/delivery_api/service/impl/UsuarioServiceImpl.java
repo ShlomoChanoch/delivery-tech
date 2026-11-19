@@ -8,12 +8,10 @@ import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
 import com.deliverytech.delivery_api.security.JwtUtil;
 import com.deliverytech.delivery_api.service.UsuarioService;
-
-import lombok.RequiredArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,14 +21,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtil jwtUtil;
 
-    private final  UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     private final PasswordEncoder passwordEncoder;
 

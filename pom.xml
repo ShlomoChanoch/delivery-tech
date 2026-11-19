@@ -202,7 +202,8 @@
      </execution>
      <execution>
       <id>report</id>
-      <phase>test</phase>
+      <!-- apos os ITs do Failsafe: o exec acumula unitarios + integracao -->
+      <phase>verify</phase>
       <goals>
        <goal>report</goal>
       </goals>

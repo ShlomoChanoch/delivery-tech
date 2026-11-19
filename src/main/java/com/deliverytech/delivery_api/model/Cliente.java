@@ -34,10 +34,6 @@ public class Cliente {
         this.ativo = false;
     }
 
-    // Comentário mantido para referência futura
-    /* @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    private List<Pedido> pedidos; */
-
     // Construtor customizado para testes
     public Cliente(
             Long id,

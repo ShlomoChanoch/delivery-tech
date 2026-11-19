@@ -84,8 +84,6 @@ class PedidoControllerIT {
         // Restaurante
         restaurante = new Restaurante();
         restaurante.setNome("Pizzaria do João");
-        /* ❌ REMOVER: restaurante.setEndereco("Av Pizzaria, 456"); */
-        /* ❌ REMOVER: restaurante.setCep("12345-678"); */
         restaurante.setTelefone("11888888888");
         restaurante.setCategoria("Italiana");
         restaurante.setTaxaEntrega(BigDecimal.valueOf(5.00)); // ✅ Adicionar
