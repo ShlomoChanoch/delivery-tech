@@ -100,9 +100,9 @@ class UsuarioServiceImplTest {
         var causa = new BadCredentialsException("Bad credentials");
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(causa);
+        LoginRequest request = loginRequest();
 
-        RuntimeException ex =
-                assertThrows(RuntimeException.class, () -> service.login(loginRequest()));
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> service.login(request));
 
         assertEquals("Credenciais inválidas", ex.getMessage());
         assertSame(causa, ex.getCause());
@@ -170,9 +170,9 @@ class UsuarioServiceImplTest {
     @DisplayName("Salvar: email já cadastrado lança exceção e não persiste")
     void salvar_EmailDuplicado_LancaExcecao() {
         when(usuarioRepository.findByEmail(EMAIL)).thenReturn(usuario());
+        RegisterRequest request = registerRequest(null);
 
-        RuntimeException ex =
-                assertThrows(RuntimeException.class, () -> service.salvar(registerRequest(null)));
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> service.salvar(request));
 
         assertTrue(ex.getMessage().contains(EMAIL));
         verify(usuarioRepository, never()).save(any());
