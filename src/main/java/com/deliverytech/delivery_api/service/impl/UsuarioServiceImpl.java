@@ -11,17 +11,18 @@ import com.deliverytech.delivery_api.service.UsuarioService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class UsuarioServiceImpl implements UsuarioService {
+public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
 
     private final AuthenticationManager authenticationManager;
 
@@ -30,6 +31,29 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    // @Lazy no AuthenticationManager quebra o ciclo: o Security instancia o UserDetailsService
+    // (este bean) durante a construção do próprio AuthenticationManager. Sem o proxy lazy, a
+    // injeção por construtor pediria o bean ainda em criação (BeanCurrentlyInCreationException).
+    public UsuarioServiceImpl(
+            @Lazy AuthenticationManager authenticationManager,
+            JwtUtil jwtUtil,
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserDetails usuario = usuarioRepository.findByEmail(username);
+        if (usuario == null) {
+            throw new UsernameNotFoundException("Usuário não encontrado: " + username);
+        }
+        return usuario;
+    }
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {

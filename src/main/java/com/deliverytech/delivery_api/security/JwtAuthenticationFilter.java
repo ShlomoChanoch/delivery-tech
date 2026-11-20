@@ -29,9 +29,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var login = jwtUtil.getEmailFromToken(token);
             UserDetails user = usuarioRepository.findByEmail(login);
 
-            var authentication =
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Token válido de usuário deletado: segue sem autenticação (o Security barra com
+            // 401/403) em vez de NPE no filtro, que virava 500 em qualquer rota.
+            if (user != null) {
+                var authentication =
+                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request, response);
     }
