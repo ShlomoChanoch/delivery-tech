@@ -2,7 +2,7 @@
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (111 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
+> **Status atual:** ✅ `make test` verde (128 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
 
 ---
 
@@ -43,7 +43,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 ## 📈 Status do Projeto
 
 ✅ **Funcional e verificado**  
-> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (84 unitários + 27 de integração).
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (101 unitários + 27 de integração).
 
 ---
 
@@ -385,12 +385,12 @@ Existe cliente com email: true
 - [x] Criar controllers para expor as consultas customizadas via REST API (`RelatorioController`)
 - [x] Adicionar validações nos modelos (Bean Validation)
 - [x] Configurar Swagger/OpenAPI para documentação da API
-- [x] Implementar testes unitários e de integração (102 testes)
+- [x] Implementar testes unitários e de integração (128 testes)
 - [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [ ] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação
 - [ ] Trocar o H2 em memória por MySQL em homologação/produção
 - [x] Mover `jwt.secret` para variável de ambiente — **feito (19/11, commit `bb0552b`)**: `jwt.secret=${JWT_SECRET}` sem fallback; `JwtUtil` valida a chave na subida (Base64URL ≥ 256 bits); compose exige `JWT_SECRET` via `.env`; chave antiga rotacionada e tratada como comprometida
-- [ ] Implementar `AuthService` (`login`, `register` e `getCurrentUser` ainda lançam `UnsupportedOperationException`)
+- [x] Fechar o caminho de auth (T4) — **feito (20/11, commits `be96f51` + `ae559d1`)**: decisão = remover a interface morta. `AuthService`/`AuthServiceImpl` (stubs) removidos; `loadUserByUsername` vive no `UsuarioServiceImpl` (`UserDetailsService`, com `@Lazy` no `AuthenticationManager` para quebrar o ciclo de beans); null-guard no `JwtAuthenticationFilter` (token válido de usuário deletado → 403, não NPE/500). Fluxo real mantido: `AuthController` → `AuthenticationManager` + `UsuarioService.salvar`. +17 testes (14 `UsuarioServiceImplTest`, 3 `JwtAuthenticationFilterTest`); QG Sonar OK (new_coverage 92%)
 - [x] Implementar `RelatorioServiceImpl` com dados reais (era valores fixos; agora consulta os repositories)
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
 - [ ] Corrigir `DataLoader` para ser idempotente (hoje exige limpar o volume `delivery_h2_data` a cada rebuild)
@@ -514,5 +514,5 @@ make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCo
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (111 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (128 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
 
