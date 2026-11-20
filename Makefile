@@ -78,7 +78,7 @@ dev: check-wrapper ## Sobe API + painel local em localhost:8080 (Ctrl+C para)
 	@echo "⏳ Prontas quando o Spring logar 'Started ... in Xs'."
 	@echo "🛑 Para parar: Ctrl+C"
 	@echo ""
-	$(MVN) spring-boot:run -Dspring-boot.run.arguments=--server.port=$(PORT)
+	bash -c 'set -a; [ -f .env ] && . ./.env; set +a; $(MVN) spring-boot:run -Dspring-boot.run.arguments=--server.port=$(PORT)'
 
 # ------------------------------------------------------------------------------
 #  2. Qualidade de código
