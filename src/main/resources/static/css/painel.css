@@ -881,6 +881,53 @@ body::-webkit-scrollbar-track {
     font-size: 0.9em;
 }
 
+/* ---------- Estado de erro ---------- */
+
+.painel-error-card {
+    max-width: 620px;
+    padding: 32px;
+}
+
+.painel-error-code {
+    font-family: var(--painel-font-display);
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--painel-accent);
+    margin-bottom: 14px;
+}
+
+.painel-error-title {
+    margin: 0;
+    font-family: var(--painel-font-display);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--painel-text);
+}
+
+.painel-error-message {
+    margin: 10px 0 0;
+    font-size: 14px;
+    color: var(--painel-muted);
+    max-width: 52ch;
+}
+
+.painel-error-path {
+    margin: 14px 0 0;
+    font-size: 12.5px;
+    color: var(--painel-dim);
+}
+
+.painel-error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
 /* ---------- Foco ---------- */
 
 .painel-content :focus-visible,

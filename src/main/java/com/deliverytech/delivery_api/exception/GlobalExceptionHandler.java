@@ -1,21 +1,25 @@
 package com.deliverytech.delivery_api.exception;
 
+import com.deliverytech.delivery_api.controller.web.PainelExceptionHandler;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /** Tratamento global de exceções para toda a aplicação */
 @Slf4j
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final String TIMESTAMP = "timestamp";
@@ -62,11 +66,31 @@ public class GlobalExceptionHandler {
 
     /** Tratamento para rotas e recursos estáticos inexistentes (Spring MVC 6.1+) */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(
-            NoResourceFoundException ex) {
+    public Object handleNoResourceFoundException(
+            NoResourceFoundException ex, HttpServletRequest request) {
 
         log.warn("Recurso estático/rota não encontrado: {}", ex.getMessage());
+        if (isPainelHtmlRequest(request)) {
+            return PainelExceptionHandler.criarPaginaErro(
+                    HttpStatus.NOT_FOUND,
+                    "Página não encontrada",
+                    "O endereço solicitado não existe no painel",
+                    "Verifique o endereço ou escolha uma das seções no menu lateral.",
+                    request.getRequestURI());
+        }
         return buildNotFoundResponse(ex.getMessage());
+    }
+
+    private boolean isPainelHtmlRequest(HttpServletRequest request) {
+        if (request == null) {
+            return false;
+        }
+        String uri = request.getRequestURI();
+        String accept = request.getHeader(HttpHeaders.ACCEPT);
+        return uri != null
+                && uri.startsWith("/painel")
+                && accept != null
+                && accept.contains(MediaType.TEXT_HTML_VALUE);
     }
 
     /** Tratamento para entidades de domínio não encontradas */

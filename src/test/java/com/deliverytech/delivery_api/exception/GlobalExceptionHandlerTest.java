@@ -13,11 +13,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,16 +78,21 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("NoResourceFoundException deve retornar 404 com envelope padrão")
+    @DisplayName("NoResourceFoundException em requisição API deve retornar 404 com envelope JSON")
     void testHandleNoResourceFoundException_DeveRetornar404ComEnvelope() {
         // Given
         NoResourceFoundException ex =
-                new NoResourceFoundException(HttpMethod.GET, "painel/nao-existe");
+                new NoResourceFoundException(HttpMethod.GET, "api/rota-inexistente");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/api/rota-inexistente");
+        request.addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 
         // When
-        ResponseEntity<Map<String, Object>> response = handler.handleNoResourceFoundException(ex);
+        Object result = handler.handleNoResourceFoundException(ex, request);
 
         // Then
+        @SuppressWarnings("unchecked")
+        ResponseEntity<Map<String, Object>> response =
+                assertInstanceOf(ResponseEntity.class, result);
         assertEquals(404, response.getStatusCode().value());
         Map<String, Object> body = response.getBody();
         assertNotNull(body);
@@ -91,6 +100,27 @@ class GlobalExceptionHandlerTest {
         assertEquals(404, body.get("status"));
         assertEquals("Recurso não encontrado", body.get("error"));
         assertEquals(ex.getMessage(), body.get("message"));
+    }
+
+    @Test
+    @DisplayName("NoResourceFoundException no painel com Accept HTML deve renderizar painel/erro")
+    void testHandleNoResourceFoundException_PainelHtml_DeveRetornarModelAndView404() {
+        // Given
+        NoResourceFoundException ex =
+                new NoResourceFoundException(HttpMethod.GET, "painel/nao-existe");
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/painel/nao-existe");
+        request.addHeader(HttpHeaders.ACCEPT, MediaType.TEXT_HTML_VALUE);
+
+        // When
+        Object result = handler.handleNoResourceFoundException(ex, request);
+
+        // Then
+        ModelAndView mv = assertInstanceOf(ModelAndView.class, result);
+        assertEquals("painel/erro", mv.getViewName());
+        assertEquals(404, mv.getStatus().value());
+        assertEquals(404, mv.getModel().get("statusCode"));
+        assertEquals("Página não encontrada", mv.getModel().get("tituloErro"));
+        assertEquals("/painel/nao-existe", mv.getModel().get("caminho"));
     }
 
     @Test

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: content(${tituloErro}, '', ~{:: main})}">
+<head>
+    <title th:text="${tituloErro}">Erro</title>
+</head>
+<main>
+    <section class="painel-card painel-error-card" aria-labelledby="erro-titulo">
+        <div class="painel-error-code" th:text="${statusCode}">500</div>
+        <h2 class="painel-error-title" id="erro-titulo" th:text="${subtituloErro}">
+            Algo deu errado
+        </h2>
+        <p class="painel-error-message" th:text="${mensagemErro}">
+            Não foi possível concluir a solicitação no momento.
+        </p>
+        <p class="painel-error-path" th:if="${caminho != null and !#strings.isEmpty(caminho)}">
+            Endereço acessado: <code th:text="${caminho}">/painel</code>
+        </p>
+        <div class="painel-error-actions">
+            <a class="btn btn-primary" th:href="@{/painel}">Voltar ao dashboard</a>
+            <a class="btn btn-outline-secondary" th:href="@{/painel/relatorios}">Ver relatórios</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>
