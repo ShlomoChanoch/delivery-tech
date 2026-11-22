@@ -2,7 +2,7 @@
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (163 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas + estado de erro validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK (71,6% de cobertura geral) · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
+> **Status atual:** ✅ `make test` verde (166 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas + estado de erro validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK (72,4% de cobertura geral) · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
 
 ---
 
@@ -43,7 +43,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 ## 📈 Status do Projeto
 
 ✅ **Funcional e verificado**  
-> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (108 unitários + 55 de integração).
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (110 unitários + 56 de integração).
 
 ---
 
@@ -146,10 +146,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 
 ## ⚠️ Problemas conhecidos (pré-existentes, fora do escopo do painel)
 
-1. **Crash-loop a cada rebuild do container.** `DataLoader` não é idempotente e o H2 é file-based dentro do volume `delivery_h2_data`; ao recriar o container, os dados duplicam/sobrescrevem e o `DataLoader` falha em loop. **Workaround:**
-   ```bash
-   podman compose down && podman volume rm delivery_h2_data && podman compose up -d --build --force-recreate
-   ```
+1. ~~**Crash-loop a cada rebuild do container.**~~ — **resolvido (22/11, commit `52a1494`)**: `DataLoader` agora é idempotente (`existsByEmail` para clientes, `existsByNome` para restaurantes e produtos, `count() > 0` para pedidos) — reiniciar o container com o volume `delivery_h2_data` preservado não duplica nem falha.
 2. ~~**`GlobalExceptionHandler` devolve 500 para `NoResourceFoundException`**~~ — **resolvido (22/11, commit `312c438`)**: rotas e assets inexistentes retornam **404** com envelope padrão.
 3. **`GET /api/relatorios/*` exige JWT** (403 sem token): o painel lê os relatórios direto do `RelatorioServiceImpl`, não pela API HTTP.
 
@@ -385,7 +382,7 @@ Existe cliente com email: true
 - [x] Criar controllers para expor as consultas customizadas via REST API (`RelatorioController`)
 - [x] Adicionar validações nos modelos (Bean Validation)
 - [x] Configurar Swagger/OpenAPI para documentação da API
-- [x] Implementar testes unitários e de integração (163 testes)
+- [x] Implementar testes unitários e de integração (166 testes)
 - [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [x] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação — **feito (22/11, commit `68511bb`)**: criados `RestauranteControllerIT` (9 ITs), `ProdutoControllerIT` (3 ITs), `RelatorioControllerIT` (4 ITs) e `AuthControllerIT` (4 ITs com fluxo JWT real: register → login → rota protegida, 401, 403 sem token/inválido/usuário deletado); `JwtAuthenticationFilter` endurecido para capturar `JwtException`/`IllegalArgumentException` sem vazar 500 (+1 unitário); cobertura geral saltou de 54,9% para **71,6%**; QG Sonar OK (`new_coverage` 91,8%, 0 issues novas)
 - [ ] Trocar o H2 em memória por MySQL em homologação/produção
@@ -393,7 +390,7 @@ Existe cliente com email: true
 - [x] Fechar o caminho de auth (T4) — **feito (20/11, commits `be96f51` + `ae559d1`)**: decisão = remover a interface morta. `AuthService`/`AuthServiceImpl` (stubs) removidos; `loadUserByUsername` vive no `UsuarioServiceImpl` (`UserDetailsService`, com `@Lazy` no `AuthenticationManager` para quebrar o ciclo de beans); null-guard no `JwtAuthenticationFilter` (token válido de usuário deletado → 403, não NPE/500). Fluxo real mantido: `AuthController` → `AuthenticationManager` + `UsuarioService.salvar`. +17 testes (14 `UsuarioServiceImplTest`, 3 `JwtAuthenticationFilterTest`); QG Sonar OK (new_coverage 92%)
 - [x] Implementar `RelatorioServiceImpl` com dados reais (era valores fixos; agora consulta os repositories)
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
-- [ ] Corrigir `DataLoader` para ser idempotente (hoje exige limpar o volume `delivery_h2_data` a cada rebuild)
+- [x] Corrigir `DataLoader` para ser idempotente — **feito (22/11, commit `52a1494`)**: guardas por entidade (`existsByEmail` em clientes, `existsByNome` em restaurantes e produtos, além de `count() > 0` em pedidos); validado em container (`make up` → `podman compose down` sem apagar `delivery_h2_data` → `podman compose up`: sem crash-loop, sem duplicação, KPIs idênticos no dashboard); +3 testes (2 unitários em `DataLoaderTest` + `DataLoaderIT`); QG Sonar OK (`new_coverage` 93,5%, cobertura geral **72,4%**, 0 issues novas)
 - [x] Corrigir `GlobalExceptionHandler` para devolver 404 em `NoResourceFoundException` — **feito (22/11, commit `312c438`)**: handler específico para `NoResourceFoundException` e `EntityNotFoundException` retornando 404 com envelope padrão (`timestamp`, `status`, `error`, `message`); null-guard em `handleRuntimeException` (sem NPE quando `message == null`) + envelope padronizado no 404; `/painel/` com barra final retorna 404; +7 testes (3 unitários em `GlobalExceptionHandlerTest`, 4 ITs em `GlobalExceptionHandlerIT`); QG Sonar OK (`new_coverage` 93,5%, 0 issues novas)
 - [x] Implementar estado de erro do painel — **feito (22/11, commit `f503a99`)**: template `painel/erro.html` integrado ao layout escuro + `PainelExceptionHandler` (`@ControllerAdvice` escopado a `PainelController`, `@Order(HIGHEST_PRECEDENCE)`) + content negotiation em `GlobalExceptionHandler` para 404 HTML em `/painel/**` sem afetar o envelope JSON de `/api/**`; validado por Playwright nas 5 páginas + rotas 404 (0 erros de console, 0 overflow, recuperação via botão); +7 testes (3 unitários + 4 ITs em `PainelErroIT`, incluindo 500 induzido); QG Sonar OK (`new_coverage` 91,6%, 0 issues novas)
 
@@ -508,11 +505,11 @@ A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-D
 make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCoCo)
 ```
 
-- **108 testes unitários** em 14 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `PainelExceptionHandlerTest`, `RelatorioServiceImplTest`, `UsuarioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `JwtAuthenticationFilterTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
-- **55 testes de integração** em 9 classes: `ClienteControllerIT`, `PedidoControllerIT`, `RestauranteControllerIT`, `ProdutoControllerIT`, `RelatorioControllerIT`, `AuthControllerIT`, `PainelRelatoriosIT`, `PainelErroIT` e `GlobalExceptionHandlerIT` (executados pelo Failsafe no `mvn verify`)
+- **110 testes unitários** em 14 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `PainelExceptionHandlerTest`, `RelatorioServiceImplTest`, `UsuarioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `JwtAuthenticationFilterTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
+- **56 testes de integração** em 10 classes: `ClienteControllerIT`, `PedidoControllerIT`, `RestauranteControllerIT`, `ProdutoControllerIT`, `RelatorioControllerIT`, `AuthControllerIT`, `PainelRelatoriosIT`, `PainelErroIT`, `GlobalExceptionHandlerIT` e `DataLoaderIT` (executados pelo Failsafe no `mvn verify`)
 - Relatório de cobertura: `make coverage`
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (163 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf + estado de erro, validado por Playwright), com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (166 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf + estado de erro, validado por Playwright), com o histórico de alterações preservado acima.
 
