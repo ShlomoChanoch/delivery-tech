@@ -25,7 +25,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 - **Java 21** – LTS  
 - **Spring Boot 3.5.14** – API REST; versões fixadas no `pom.xml` para correção de CVEs: Spring Framework **6.2.19**, Spring Security **6.5.9**, Tomcat **10.1.59**, Jackson **2.21.7**  
 - **Spring Security + JWT** – autenticação stateless (BCrypt, filtro `JwtAuthenticationFilter`)  
-- **Spring Data JPA + H2** – banco em memória para dev/teste (driver MySQL 8.4 incluído no `pom.xml`)  
+- **Spring Data JPA + H2 / MySQL 8.4** – H2 em memória para dev/teste; MySQL 8.4 via `docker-compose.yml` e profile `prod`  
 - **Caffeine** – cache  
 - **SpringDoc OpenAPI** – Swagger UI em `/swagger-ui.html`  
 - **Lombok 1.18.48**, **ModelMapper** e **Bean Validation**  
@@ -385,7 +385,7 @@ Existe cliente com email: true
 - [x] Implementar testes unitários e de integração (166 testes)
 - [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [x] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação — **feito (22/11, commit `68511bb`)**: criados `RestauranteControllerIT` (9 ITs), `ProdutoControllerIT` (3 ITs), `RelatorioControllerIT` (4 ITs) e `AuthControllerIT` (4 ITs com fluxo JWT real: register → login → rota protegida, 401, 403 sem token/inválido/usuário deletado); `JwtAuthenticationFilter` endurecido para capturar `JwtException`/`IllegalArgumentException` sem vazar 500 (+1 unitário); cobertura geral saltou de 54,9% para **71,6%**; QG Sonar OK (`new_coverage` 91,8%, 0 issues novas)
-- [ ] Trocar o H2 em memória por MySQL em homologação/produção
+- [x] Trocar o H2 em memória por MySQL em homologação/produção — **feito (22/11, commit `a3173bf`)**: serviço `mysql:8.4` com healthcheck e volume `delivery_mysql_data` no `docker-compose.yml`, novo `application-prod.properties` (H2 console off, logging `INFO`, Thymeleaf cache on), remoção de `H2Dialect` fixo em `application.properties` (detecção automática pelo Hibernate 6), `ENV SPRING_PROFILES_ACTIVE=docker` no `Dockerfile` (preserva CI standalone e permite override no compose) e Adminer apontando para `mysql`; validado ponta a ponta contra MySQL 8.4 (`database: MySQL`, 5 páginas do painel, JWT e todas as queries nativas de relatórios); `trivy config` limpo; QG Sonar OK
 - [x] Mover `jwt.secret` para variável de ambiente — **feito (19/11, commit `bb0552b`)**: `jwt.secret=${JWT_SECRET}` sem fallback; `JwtUtil` valida a chave na subida (Base64URL ≥ 256 bits); compose exige `JWT_SECRET` via `.env`; chave antiga rotacionada e tratada como comprometida
 - [x] Fechar o caminho de auth (T4) — **feito (20/11, commits `be96f51` + `ae559d1`)**: decisão = remover a interface morta. `AuthService`/`AuthServiceImpl` (stubs) removidos; `loadUserByUsername` vive no `UsuarioServiceImpl` (`UserDetailsService`, com `@Lazy` no `AuthenticationManager` para quebrar o ciclo de beans); null-guard no `JwtAuthenticationFilter` (token válido de usuário deletado → 403, não NPE/500). Fluxo real mantido: `AuthController` → `AuthenticationManager` + `UsuarioService.salvar`. +17 testes (14 `UsuarioServiceImplTest`, 3 `JwtAuthenticationFilterTest`); QG Sonar OK (new_coverage 92%)
 - [x] Implementar `RelatorioServiceImpl` com dados reais (era valores fixos; agora consulta os repositories)
@@ -497,7 +497,7 @@ make smoke   # sobe, checa /actuator/health, /painel e /api-docs, derruba
 make down    # para os containers e apaga o volume do H2 (delivery_h2_data)
 ```
 
-A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-Dspring.profiles.active=docker`.
+A imagem final usa **distroless** (sem shell, usuário `nonroot`) com `ENV SPRING_PROFILES_ACTIVE=docker` (fallback H2 para execução standalone) e sobe em `SPRING_PROFILES_ACTIVE=prod` com **MySQL 8.4** no `docker-compose.yml` (Adminer apontando para `mysql`).
 
 ### 🧪 Testes
 
