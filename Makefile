@@ -3,13 +3,13 @@
 # ==============================================================================
 #
 #  Uso rápido:
-#    make dev        →  Sobe API + painel local (localhost:8080) — Ctrl+C para
-#    make smoke      →  Valida o build em container (sobe, checa endpoints, derruba)
+#    make dev        →  Sobe MySQL + API + painel local (localhost:8080) — Ctrl+C para
+#    make smoke      →  Valida o build em container (MySQL + API + Adminer)
 #    make test       →  Roda os testes (gera cobertura JaCoCo em target/site/)
 #    make ci-local   →  Roda todas as verificações antes de todo git push
 #    make help       →  Lista todos os comandos disponíveis
 #
-#  Requisitos: JDK 21+ instalado. O Maven NÃO precisa estar instalado:
+#  Requisitos: JDK 21+ e Podman/Docker (compose). O Maven NÃO precisa estar instalado:
 #  usamos o wrapper (./mvnw), que baixa a versão fixada no projeto.
 #
 #  Engine de container: usa Podman se instalado; caso contrário, Docker.
@@ -19,7 +19,7 @@
 #    http://localhost:8080/swagger-ui/index.html
 #    http://localhost:8080/api-docs
 #    http://localhost:8080/actuator/health
-#    http://localhost:8080/h2-console
+#    MySQL local: 127.0.0.1:3306 (credenciais em .env)
 #  Com 'make up'/'make smoke' há também o Adminer: http://localhost:8083
 #
 # ==============================================================================
@@ -38,7 +38,7 @@ PORT         := 8080
 .PHONY: help \
         check-wrapper check-engine check-compose check-trivy \
         lint format test coverage \
-        package build scan up dev down logs smoke clean \
+        package build scan up dev down reset-db logs smoke clean \
         validate-tests deploy-local \
         ci-local
 
@@ -63,7 +63,10 @@ check-compose: check-engine
 # ------------------------------------------------------------------------------
 #  1. Execução de código
 # ------------------------------------------------------------------------------
-dev: check-wrapper ## Sobe API + painel local em localhost:8080 (Ctrl+C para)
+dev: check-wrapper check-compose ## Sobe MySQL (container) + API + painel local em localhost:8080 (Ctrl+C para)
+	@test -f .env || { echo "Erro: arquivo .env não encontrado. Copie .env.example para .env e preencha JWT_SECRET e MYSQL_*"; exit 1; }
+	@echo "🐬 Subindo MySQL 8.4..."
+	$(COMPOSE) up -d --wait --wait-timeout 120 mysql
 	@echo ""
 	@echo "┌───────────────────────────────────────────────────────────────┐"
 	@echo "│  🚀 URLs disponíveis                                         │"
@@ -72,13 +75,19 @@ dev: check-wrapper ## Sobe API + painel local em localhost:8080 (Ctrl+C para)
 	@printf "│  %-59s │\n" "Swagger UI   → http://localhost:$(PORT)/swagger-ui/index.html"
 	@printf "│  %-59s │\n" "API Docs     → http://localhost:$(PORT)/api-docs"
 	@printf "│  %-59s │\n" "Health       → http://localhost:$(PORT)/actuator/health"
-	@printf "│  %-59s │\n" "H2 Console   → http://localhost:$(PORT)/h2-console"
+	@printf "│  %-59s │\n" "MySQL 8.4    → 127.0.0.1:$${MYSQL_PORT:-3306}/$${MYSQL_DATABASE:-delivery}"
 	@echo "└───────────────────────────────────────────────────────────────┘"
 	@echo ""
 	@echo "⏳ Prontas quando o Spring logar 'Started ... in Xs'."
-	@echo "🛑 Para parar: Ctrl+C"
+	@echo "🛑 Para parar a API: Ctrl+C (para parar o MySQL: make down)"
 	@echo ""
-	bash -c 'set -a; [ -f .env ] && . ./.env; set +a; $(MVN) spring-boot:run -Dspring-boot.run.arguments=--server.port=$(PORT)'
+	bash -c 'set -a; . ./.env; set +a; \
+		export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:$${MYSQL_PORT:-3306}/$${MYSQL_DATABASE:-delivery}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo&characterEncoding=UTF-8"; \
+		export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"; \
+		export SPRING_DATASOURCE_USERNAME="$${MYSQL_USER:-delivery}"; \
+		export SPRING_DATASOURCE_PASSWORD="$${MYSQL_PASSWORD:?defina MYSQL_PASSWORD no .env}"; \
+		export SPRING_H2_CONSOLE_ENABLED="false"; \
+		$(MVN) spring-boot:run -Dspring-boot.run.arguments=--server.port=$(PORT)'
 
 # ------------------------------------------------------------------------------
 #  2. Qualidade de código
@@ -115,13 +124,16 @@ scan: check-engine check-trivy ## Trivy (config + vulnerabilidades + segredos); 
 	trivy image --exit-code 1 --scanners vuln,secret \
 		--severity HIGH,CRITICAL --ignore-unfixed $(IMAGE_NAME):$(IMAGE_TAG)
 
-up: check-compose ## Sobe a stack (API + Adminer) e só retorna quando pronta
+up: check-compose ## Sobe a stack (MySQL + API + Adminer) e só retorna quando pronta
 	$(COMPOSE) up -d --build --wait --wait-timeout 180
 
-down: check-compose ## Para e remove os containers e o volume do H2
+down: check-compose ## Para e remove os containers (preserva o volume do MySQL)
 	$(COMPOSE) down
-	@# TODO: remover quando descobrirmos como resetar o H2 sem apagar o volume toda vez.
-	@$(ENGINE) volume rm delivery_h2_data >/dev/null 2>&1 || true
+
+reset-db: check-compose ## Para os containers e apaga o volume do MySQL (delivery_mysql_data)
+	$(COMPOSE) down
+	@$(ENGINE) volume rm delivery_mysql_data >/dev/null 2>&1 || true
+	@echo "🧹 Volume delivery_mysql_data removido."
 
 logs: check-compose ## Fica vendo os logs da API (Ctrl+C sai sem parar a API)
 	$(COMPOSE) logs -f delivery-api

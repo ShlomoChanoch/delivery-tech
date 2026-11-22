@@ -9,11 +9,13 @@ services:
   mysql:
     image: docker.io/library/mysql:8.4
     container_name: delivery-mysql
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-delivery}
       MYSQL_USER: ${MYSQL_USER:-delivery}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-delivery_local_pass}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_local_pass}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?defina MYSQL_PASSWORD no .env — veja .env.example}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?defina MYSQL_ROOT_PASSWORD no .env — veja .env.example}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -51,7 +53,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-delivery}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo&characterEncoding=UTF-8
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-delivery}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-delivery_local_pass}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:?defina MYSQL_PASSWORD no .env — veja .env.example}
 
       # JPA/Hibernate
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
