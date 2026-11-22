@@ -20,6 +20,38 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 
 ---
 
+## 🔄 Como o sistema é alimentado na prática?
+
+O projeto segue o modelo **Headless / API-first**. O backend é um motor de serviços pronto para ser conectado e alimentado por diferentes pontas:
+
+```text
+[ App do Consumidor ]  ──(POST /api/pedidos)───────┐
+[ App do Restaurante ] ──(POST /api/produtos)──────┤
+[ App do Entregador ]  ──(PATCH /pedidos/status)───┼──► [ API Spring Boot ] ──► [ MySQL / H2 ]
+                                                   │             │
+                                                   │             ▼
+                                                   │     [ /painel (Leitura) ]
+                                                   │     [ Swagger UI / OpenAPI ]
+[ Swagger / Postman ]  ──(Testes Manuais)──────────┘
+```
+
+1. **Aplicativos de Consumidor (Mobile / Web):**
+   - Cadastram o cliente: `POST /api/clientes`
+   - Fazem login e recebem o token JWT: `POST /api/auth/login`
+   - Navegam no cardápio: `GET /api/produtos`
+   - Enviam e pagam pedidos: `POST /api/pedidos`
+
+2. **Sistemas / Portais dos Restaurantes:**
+   - Cadastram e alteram itens do cardápio: `POST` / `PUT /api/produtos`
+   - Atualizam o status da cozinha: `PATCH /api/pedidos/{id}/status` (`PREPARANDO`, `SAIU_PARA_ENTREGA`)
+
+3. **Como a equipe técnica testa e alimenta hoje:**
+   - **Carga Inicial Automática:** Na inicialização, a classe `src/main/java/com/deliverytech/delivery_api/config/DataLoader.java` insere dados iniciais (restaurantes, produtos, clientes e pedidos demonstrativos) de forma idempotente para que o sistema não suba vazio.
+   - **Swagger UI / Documentação Interativa:** No endereço `http://localhost:8080/swagger-ui.html`, você encontra todos os endpoints documentados com botões "Try it out" para testar requisições `POST`, `PUT`, `DELETE` diretamente pelo navegador sem precisar de código frontend.
+   - **Ferramentas como Postman / cURL / Insomnia:** Para simular as requisições que os aplicativos fariam.
+
+---
+
 ## 🛠️ Tecnologias e Ferramentas
 
 - **Java 21** – LTS  
