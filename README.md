@@ -2,7 +2,7 @@
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (135 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
+> **Status atual:** ✅ `make test` verde (142 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas + estado de erro validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
 
 ---
 
@@ -43,7 +43,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 ## 📈 Status do Projeto
 
 ✅ **Funcional e verificado**  
-> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (104 unitários + 31 de integração).
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (107 unitários + 35 de integração).
 
 ---
 
@@ -385,7 +385,7 @@ Existe cliente com email: true
 - [x] Criar controllers para expor as consultas customizadas via REST API (`RelatorioController`)
 - [x] Adicionar validações nos modelos (Bean Validation)
 - [x] Configurar Swagger/OpenAPI para documentação da API
-- [x] Implementar testes unitários e de integração (135 testes)
+- [x] Implementar testes unitários e de integração (142 testes)
 - [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [ ] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação
 - [ ] Trocar o H2 em memória por MySQL em homologação/produção
@@ -395,7 +395,7 @@ Existe cliente com email: true
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
 - [ ] Corrigir `DataLoader` para ser idempotente (hoje exige limpar o volume `delivery_h2_data` a cada rebuild)
 - [x] Corrigir `GlobalExceptionHandler` para devolver 404 em `NoResourceFoundException` — **feito (22/11, commit `312c438`)**: handler específico para `NoResourceFoundException` e `EntityNotFoundException` retornando 404 com envelope padrão (`timestamp`, `status`, `error`, `message`); null-guard em `handleRuntimeException` (sem NPE quando `message == null`) + envelope padronizado no 404; `/painel/` com barra final retorna 404; +7 testes (3 unitários em `GlobalExceptionHandlerTest`, 4 ITs em `GlobalExceptionHandlerIT`); QG Sonar OK (`new_coverage` 93,5%, 0 issues novas)
-- [ ] Implementar estado de erro do painel (depende do item acima)
+- [x] Implementar estado de erro do painel — **feito (22/11, commit `f503a99`)**: template `painel/erro.html` integrado ao layout escuro + `PainelExceptionHandler` (`@ControllerAdvice` escopado a `PainelController`, `@Order(HIGHEST_PRECEDENCE)`) + content negotiation em `GlobalExceptionHandler` para 404 HTML em `/painel/**` sem afetar o envelope JSON de `/api/**`; validado por Playwright nas 5 páginas + rotas 404 (0 erros de console, 0 overflow, recuperação via botão); +7 testes (3 unitários + 4 ITs em `PainelErroIT`, incluindo 500 induzido); QG Sonar OK (`new_coverage` 91,6%, 0 issues novas)
 
 ---
 
@@ -508,11 +508,11 @@ A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-D
 make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCoCo)
 ```
 
-- **104 testes unitários** em 13 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `RelatorioServiceImplTest`, `UsuarioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `JwtAuthenticationFilterTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
-- **31 testes de integração** em `ClienteControllerIT`, `PedidoControllerIT`, `PainelRelatoriosIT` e `GlobalExceptionHandlerIT` (executados pelo Failsafe no `mvn verify`)
+- **107 testes unitários** em 14 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `PainelExceptionHandlerTest`, `RelatorioServiceImplTest`, `UsuarioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `JwtAuthenticationFilterTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
+- **35 testes de integração** em `ClienteControllerIT`, `PedidoControllerIT`, `PainelRelatoriosIT`, `GlobalExceptionHandlerIT` e `PainelErroIT` (executados pelo Failsafe no `mvn verify`)
 - Relatório de cobertura: `make coverage`
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (135 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (142 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf + estado de erro, validado por Playwright), com o histórico de alterações preservado acima.
 
