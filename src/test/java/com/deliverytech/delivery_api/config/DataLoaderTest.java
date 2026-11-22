@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -111,6 +113,57 @@ class DataLoaderTest {
 
         verify(pedidoRepository, never()).save(any(Pedido.class));
         verify(clienteRepository, never()).findAll();
+    }
+
+    @Test
+    void naoDeveDuplicarEntidadesQuandoBaseJaEstaPopulada() throws Exception {
+        when(clienteRepository.existsByEmail(anyString())).thenReturn(true);
+        when(restauranteRepository.existsByNome(anyString())).thenReturn(true);
+        when(restauranteRepository.findAll())
+                .thenReturn(
+                        List.of(
+                                restaurante(1L, "Pizza Express"),
+                                restaurante(2L, "Burger King"),
+                                restaurante(3L, "Sushi House"),
+                                restaurante(4L, "Gyros Athenas"),
+                                restaurante(5L, "Chiparia do Porto")));
+        when(produtoRepository.existsByNome(anyString())).thenReturn(true);
+        when(pedidoRepository.count()).thenReturn(12L);
+
+        loader.run();
+
+        verify(clienteRepository, never()).saveAll(anyList());
+        verify(restauranteRepository, never()).saveAll(anyList());
+        verify(produtoRepository, never()).saveAll(anyList());
+        verify(pedidoRepository, never()).save(any(Pedido.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void deveInserirApenasEntidadesFaltantesNaReexecucao() throws Exception {
+        when(clienteRepository.existsByEmail(anyString())).thenReturn(false);
+        when(clienteRepository.existsByEmail("joao@email.com")).thenReturn(true);
+        when(restauranteRepository.existsByNome(anyString())).thenReturn(false);
+        when(restauranteRepository.existsByNome("Pizza Express")).thenReturn(true);
+        when(restauranteRepository.findAll()).thenReturn(List.of(restaurante(1L, "Pizza Express")));
+        when(produtoRepository.existsByNome("Pizza Margherita")).thenReturn(true);
+        when(produtoRepository.existsByNome("Pizza Pepperoni")).thenReturn(false);
+        when(pedidoRepository.count()).thenReturn(12L);
+
+        loader.run();
+
+        ArgumentCaptor<List<Cliente>> clientesCaptor = ArgumentCaptor.forClass(List.class);
+        verify(clienteRepository).saveAll(clientesCaptor.capture());
+        assertEquals(4, clientesCaptor.getValue().size());
+
+        ArgumentCaptor<List<Restaurante>> restaurantesCaptor = ArgumentCaptor.forClass(List.class);
+        verify(restauranteRepository).saveAll(restaurantesCaptor.capture());
+        assertEquals(4, restaurantesCaptor.getValue().size());
+
+        ArgumentCaptor<List<Produto>> produtosCaptor = ArgumentCaptor.forClass(List.class);
+        verify(produtoRepository).saveAll(produtosCaptor.capture());
+        assertEquals(1, produtosCaptor.getValue().size());
+        assertEquals("Pizza Pepperoni", produtosCaptor.getValue().get(0).getNome());
     }
 
     @Test

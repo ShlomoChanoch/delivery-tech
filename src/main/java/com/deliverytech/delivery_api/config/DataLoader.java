@@ -96,8 +96,16 @@ public class DataLoader implements CommandLineRunner {
         cliente5.setEndereco("Rua 25 de Março, 654 - Centro, São Paulo - SP");
         cliente5.setAtivo(true);
 
-        clienteRepository.saveAll(Arrays.asList(cliente1, cliente2, cliente3, cliente4, cliente5));
-        log.info("✓ 5 clientes inseridos");
+        List<Cliente> novos =
+                List.of(cliente1, cliente2, cliente3, cliente4, cliente5).stream()
+                        .filter(c -> !clienteRepository.existsByEmail(c.getEmail()))
+                        .toList();
+        if (novos.isEmpty()) {
+            log.info("--- Clientes já existentes: seed de clientes ignorado ---");
+            return;
+        }
+        clienteRepository.saveAll(novos);
+        log.info("✓ {} clientes inseridos", novos.size());
     }
 
     private void inserirRestaurantes() {
@@ -138,10 +146,17 @@ public class DataLoader implements CommandLineRunner {
         restaurante5.setTaxaEntrega(new BigDecimal("7.00"));
         restaurante5.setAtivo(true);
 
-        restauranteRepository.saveAll(
-                Arrays.asList(
-                        restaurante1, restaurante2, restaurante3, restaurante4, restaurante5));
-        log.info("✓ 5 restaurantes inseridos");
+        List<Restaurante> novos =
+                List.of(restaurante1, restaurante2, restaurante3, restaurante4, restaurante5)
+                        .stream()
+                        .filter(r -> !restauranteRepository.existsByNome(r.getNome()))
+                        .toList();
+        if (novos.isEmpty()) {
+            log.info("--- Restaurantes já existentes: seed de restaurantes ignorado ---");
+        } else {
+            restauranteRepository.saveAll(novos);
+            log.info("✓ {} restaurantes inseridos", novos.size());
+        }
 
         // Inserir produtos após restaurantes para poder associá-los
         inserirProdutos();
@@ -259,11 +274,21 @@ public class DataLoader implements CommandLineRunner {
         produto10.setRestaurante(chipariaPorto);
         produto10.setAtivo(true);
 
-        produtoRepository.saveAll(
-                Arrays.asList(
-                        produto1, produto2, produto3, produto4, produto5, produto6, produto7,
-                        produto8, produto9, produto10));
-        log.info("✓ 10 produtos inseridos");
+        List<Produto> novos =
+                List.of(
+                                produto1, produto2, produto3, produto4, produto5, produto6,
+                                produto7, produto8, produto9, produto10)
+                        .stream()
+                        .filter(p ->
+                                p.getRestaurante() != null
+                                        && !produtoRepository.existsByNome(p.getNome()))
+                        .toList();
+        if (novos.isEmpty()) {
+            log.info("--- Produtos já existentes: seed de produtos ignorado ---");
+            return;
+        }
+        produtoRepository.saveAll(novos);
+        log.info("✓ {} produtos inseridos", novos.size());
     }
 
     /**

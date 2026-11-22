@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+    boolean existsByNome(String nome);
+
     List<Produto> findByRestauranteId(Long restauranteId);
 
     List<Produto> findByDisponivelTrue();
