@@ -2,7 +2,7 @@
 
 API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
-> **Status atual:** ✅ `make test` verde (128 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
+> **Status atual:** ✅ `make test` verde (135 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas validado por Playwright (0 erros de console) · ✅ SonarQube Quality Gate OK · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
 
 ---
 
@@ -43,7 +43,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
 ## 📈 Status do Projeto
 
 ✅ **Funcional e verificado**  
-> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (101 unitários + 27 de integração).
+> Aplicação iniciando com sucesso, DataLoader carregando dados de teste, H2 Console ativo e suíte de testes completa verde (104 unitários + 31 de integração).
 
 ---
 
@@ -150,7 +150,7 @@ Este projeto tem como objetivo fornecer uma estrutura inicial robusta para aplic
    ```bash
    podman compose down && podman volume rm delivery_h2_data && podman compose up -d --build --force-recreate
    ```
-2. **`GlobalExceptionHandler` devolve 500 para `NoResourceFoundException`** — qualquer path inexistente vira 500 em vez de 404. Afeta `/favicon.ico` e todos os assets não servidos.
+2. ~~**`GlobalExceptionHandler` devolve 500 para `NoResourceFoundException`**~~ — **resolvido (22/11, commit `312c438`)**: rotas e assets inexistentes retornam **404** com envelope padrão.
 3. **`GET /api/relatorios/*` exige JWT** (403 sem token): o painel lê os relatórios direto do `RelatorioServiceImpl`, não pela API HTTP.
 
 ---
@@ -385,7 +385,7 @@ Existe cliente com email: true
 - [x] Criar controllers para expor as consultas customizadas via REST API (`RelatorioController`)
 - [x] Adicionar validações nos modelos (Bean Validation)
 - [x] Configurar Swagger/OpenAPI para documentação da API
-- [x] Implementar testes unitários e de integração (128 testes)
+- [x] Implementar testes unitários e de integração (135 testes)
 - [x] Cobrir com testes os repositories (queries nativas de `Produto`, `Cliente` e `Restaurante`)
 - [ ] Adicionar testes de integração para restaurantes, produtos, relatórios e autenticação
 - [ ] Trocar o H2 em memória por MySQL em homologação/produção
@@ -394,7 +394,7 @@ Existe cliente com email: true
 - [x] Implementar `RelatorioServiceImpl` com dados reais (era valores fixos; agora consulta os repositories)
 - [ ] Avaliar rate limiting e cache (Caffeine) nos endpoints mais acessados
 - [ ] Corrigir `DataLoader` para ser idempotente (hoje exige limpar o volume `delivery_h2_data` a cada rebuild)
-- [ ] Corrigir `GlobalExceptionHandler` para devolver 404 em `NoResourceFoundException` (hoje devolve 500)
+- [x] Corrigir `GlobalExceptionHandler` para devolver 404 em `NoResourceFoundException` — **feito (22/11, commit `312c438`)**: handler específico para `NoResourceFoundException` e `EntityNotFoundException` retornando 404 com envelope padrão (`timestamp`, `status`, `error`, `message`); null-guard em `handleRuntimeException` (sem NPE quando `message == null`) + envelope padronizado no 404; `/painel/` com barra final retorna 404; +7 testes (3 unitários em `GlobalExceptionHandlerTest`, 4 ITs em `GlobalExceptionHandlerIT`); QG Sonar OK (`new_coverage` 93,5%, 0 issues novas)
 - [ ] Implementar estado de erro do painel (depende do item acima)
 
 ---
@@ -508,11 +508,11 @@ A imagem final usa **distroless** (sem shell, usuário `nonroot`) e roda com `-D
 make test    # unitários (Surefire) + integração (Failsafe) + cobertura (JaCoCo)
 ```
 
-- **84 testes unitários** em 10 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `RelatorioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
-- **27 testes de integração** em `ClienteControllerIT`, `PedidoControllerIT` e `PainelRelatoriosIT` (executados pelo Failsafe no `mvn verify`)
+- **104 testes unitários** em 13 classes: `ClienteServiceTest`, `PedidoServiceTest`, `ClienteControllerTest`, `GlobalExceptionHandlerTest`, `RelatorioServiceImplTest`, `UsuarioServiceImplTest`, `DataLoaderTest`, `JwtUtilTest`, `JwtAuthenticationFilterTest`, `DeliveryApiApplicationTests` + 3 `@DataJpaTest` de repositório (`ProdutoRepositoryTest`, `ClienteRepositoryTest`, `RestauranteRepositoryTest`)
+- **31 testes de integração** em `ClienteControllerIT`, `PedidoControllerIT`, `PainelRelatoriosIT` e `GlobalExceptionHandlerIT` (executados pelo Failsafe no `mvn verify`)
 - Relatório de cobertura: `make coverage`
 
 ---
 
-**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (128 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
+**🎯 CONCLUSÃO:** o projeto está formatado (Spotless), testado (135 testes verdes), documentado (Swagger), com a superfície de segurança reduzida — imagem distroless, dependências corrigidas para CVEs, segredo JWT fora do código (`JWT_SECRET`) e `make scan` (Trivy) disponível para auditoria —, e agora com **painel web público** (5 páginas Thymeleaf, validado por Playwright), com o histórico de alterações preservado acima.
 
