@@ -1,14 +1,36 @@
 # ===================================================================
-# DOCKER COMPOSE - DELIVERY API (VERSÃO CORRIGIDA)
-# Configuração sem version obsoleto e com fallbacks
+# DOCKER COMPOSE - DELIVERY API + MYSQL 8.4 + ADMINER
 # ===================================================================
 
 services:
   # ===================================================================
+  # MYSQL 8.4 - Banco de Dados Relacional (homologação / produção)
+  # ===================================================================
+  mysql:
+    image: docker.io/library/mysql:8.4
+    container_name: delivery-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-delivery}
+      MYSQL_USER: ${MYSQL_USER:-delivery}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-delivery_local_pass}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_local_pass}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - delivery-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  # ===================================================================
   # DELIVERY API - Aplicação Principal
   # ===================================================================
   delivery-api:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: delivery-api
@@ -16,53 +38,43 @@ services:
     ports:
       - "8080:8080"    # Host:Container
     environment:
-      # Profile específico para Docker
-      SPRING_PROFILES_ACTIVE: docker
-      
+      # Profile de produção/homologação (MySQL 8.4, H2 console desligado, logging INFO)
+      SPRING_PROFILES_ACTIVE: prod
+
       # Configurações JVM
       JAVA_OPTS: "-Xms256m -Xmx512m -XX:+UseG1GC -XX:+UseContainerSupport"
-        
+
       # Configurações da aplicação
       SERVER_PORT: 8080
-      
-      # Banco H2 (será persistido via volume)
-      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/delivery;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE
-      SPRING_DATASOURCE_USERNAME: sa
-      SPRING_DATASOURCE_PASSWORD: 
-      
+
+      # Banco MySQL 8.4
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-delivery}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo&characterEncoding=UTF-8
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-delivery}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-delivery_local_pass}
+
       # JPA/Hibernate
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: false
-      
-      # H2 Console (para desenvolvimento)
-      SPRING_H2_CONSOLE_ENABLED: true
-      SPRING_H2_CONSOLE_PATH: /h2-console
-      SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: true
-      
-      # Security
-      SPRING_SECURITY_USER_NAME: admin
-      SPRING_SECURITY_USER_PASSWORD: admin123
-      
+
       # JWT — obrigatório: defina JWT_SECRET no .env (Base64URL, >= 32 bytes).
       # Gere com: openssl rand -base64 32 | tr '+/' '-_' | tr -d '='
       JWT_SECRET: ${JWT_SECRET:?defina JWT_SECRET no .env — veja .env.example}
       JWT_EXPIRATION: 86400000
-      
-      # Logging
-      LOGGING_LEVEL_COM_DELIVERYTECH: INFO
-      
+
     volumes:
-      # Persistir dados H2
-      - h2_data:/app/data
       # Persistir logs
       - app_logs:/app/logs
-      
-    # ADICIONAR ESTA LINHA:
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
     networks:
       - delivery-network
-      
+
     restart: unless-stopped
-    
+
     healthcheck:
       # Distroless não tem shell/wget/curl: a sonda é o HealthCheck.class
       # compilado no estágio de build do Dockerfile (docker/HealthCheck.java).
@@ -73,7 +85,7 @@ services:
       start_period: 90s
 
   # ===================================================================
-  # ADMINER - Interface Web para Banco (CORRIGIDO)
+  # ADMINER - Interface Web para o MySQL
   # ===================================================================
   adminer:
     image: adminer:latest
@@ -81,20 +93,21 @@ services:
     ports:
       - "8083:8080"
     environment:
-      ADMINER_DEFAULT_SERVER: delivery-api
+      ADMINER_DEFAULT_SERVER: mysql
     networks:
       - delivery-network
     restart: unless-stopped
     depends_on:
-      - delivery-api
+      mysql:
+        condition: service_healthy
 
 # ===================================================================
 # VOLUMES PERSISTENTES
 # ===================================================================
 volumes:
-  h2_data:
+  mysql_data:
     driver: local
-    name: delivery_h2_data
+    name: delivery_mysql_data
   app_logs:
     driver: local
     name: delivery_logs

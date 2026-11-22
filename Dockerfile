@@ -21,5 +21,6 @@ COPY --from=build /app/health/HealthCheck.class /app/health/HealthCheck.class
 
 USER nonroot:nonroot
 WORKDIR /app
+ENV SPRING_PROFILES_ACTIVE=docker
 EXPOSE 8080
-ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-Dspring.profiles.active=docker", "-jar", "/app/delivery-api.jar"]
+ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "/app/delivery-api.jar"]
