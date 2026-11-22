@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.service.impl;
 
+import com.deliverytech.delivery_api.config.CacheConfig;
 import com.deliverytech.delivery_api.dto.request.RestauranteRequest;
 import com.deliverytech.delivery_api.model.Restaurante;
 import com.deliverytech.delivery_api.repository.RestauranteRepository;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,12 @@ public class RestauranteServiceImpl implements RestauranteService {
     private final RestauranteRepository restauranteRepository;
 
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Restaurante cadastrar(RestauranteRequest restauranteRequest) {
         log.info("Iniciando cadastro de restaurante: {}", restauranteRequest.getNome());
 
@@ -79,6 +87,12 @@ public class RestauranteServiceImpl implements RestauranteService {
     }
 
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Restaurante atualizar(Long id, RestauranteRequest atualizado) {
         return restauranteRepository
                 .findById(id)
@@ -95,6 +109,12 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     // ✅ IMPLEMENTAR MÉTODO FALTANTE
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public void inativar(Long id) {
         restauranteRepository
                 .findById(id)
@@ -175,6 +195,12 @@ public class RestauranteServiceImpl implements RestauranteService {
 
     /** Alterar status ativo/inativo do restaurante */
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Restaurante alterarStatus(Long id, Boolean ativo) {
         log.info("Alterando status do restaurante ID: {} para: {}", id, ativo);
 

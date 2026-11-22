@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.service.impl;
 
+import com.deliverytech.delivery_api.config.CacheConfig;
 import com.deliverytech.delivery_api.dto.request.ItemPedidoRequest;
 import com.deliverytech.delivery_api.model.*;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,15 @@ public class PedidoServiceImpl implements PedidoService {
     private final ProdutoRepository produtoRepository;
 
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS,
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_PEDIDOS_PERIODO,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Pedido criar(Pedido pedido) {
         // ✅ SIMPLIFICAR: Definir dados básicos do pedido
         pedido.setStatus(StatusPedido.CRIADO); // ✅ USAR CRIADO ao invés de PENDENTE
@@ -68,6 +79,15 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS,
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_PEDIDOS_PERIODO,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Pedido adicionarItem(Long pedidoId, Long produtoId, Integer quantidade) {
         Pedido pedido =
                 pedidoRepository
@@ -102,6 +122,15 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS,
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_PEDIDOS_PERIODO,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Pedido confirmar(Long pedidoId) {
         Pedido pedido =
                 pedidoRepository
@@ -114,6 +143,15 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @Transactional
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS,
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_PEDIDOS_PERIODO,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Pedido atualizarStatus(Long pedidoId, StatusPedido novoStatus) {
         log.info("Atualizando status do pedido {} para: {}", pedidoId, novoStatus);
 
@@ -154,6 +192,15 @@ public class PedidoServiceImpl implements PedidoService {
 
     // ✅ ADICIONAR: Método para cancelar pedido
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS,
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_PEDIDOS_PERIODO,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Pedido cancelar(Long pedidoId) {
         Pedido pedido =
                 pedidoRepository
@@ -252,6 +299,15 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @Transactional
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_VENDAS_RESTAURANTE,
+                CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS,
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_PEDIDOS_PERIODO,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public void deletar(Long id) {
         Pedido pedido =
                 pedidoRepository

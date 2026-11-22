@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.service.impl;
 
+import com.deliverytech.delivery_api.config.CacheConfig;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
 import com.deliverytech.delivery_api.repository.PedidoRepository;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     private final PedidoRepository pedidoRepository;
 
     @Override
+    @Cacheable(CacheConfig.RELATORIO_VENDAS_RESTAURANTE)
     public List<Map<String, Object>> relatorioVendasPorRestaurante(
             LocalDate dataInicio, LocalDate dataFim) {
         List<RelatorioVendas> linhas =
@@ -77,6 +80,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     }
 
     @Override
+    @Cacheable(CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS)
     public List<Map<String, Object>> relatorioProdutosMaisVendidos(
             int limite, LocalDate dataInicio, LocalDate dataFim) {
         List<Object[]> linhas =
@@ -97,6 +101,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     }
 
     @Override
+    @Cacheable(CacheConfig.RELATORIO_CLIENTES_ATIVOS)
     public List<Map<String, Object>> relatorioClientesAtivos(
             int limite, LocalDate dataInicio, LocalDate dataFim) {
         List<Object[]> linhas =
@@ -117,6 +122,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     }
 
     @Override
+    @Cacheable(CacheConfig.RELATORIO_PEDIDOS_PERIODO)
     public Map<String, Object> relatorioPedidosPorPeriodo(
             LocalDate dataInicio, LocalDate dataFim, String agrupamento) {
         // A API exige as datas e o painel sempre passa a janela de 30 dias; a normalização
@@ -136,6 +142,7 @@ public class RelatorioServiceImpl implements RelatorioService {
     }
 
     @Override
+    @Cacheable(CacheConfig.RELATORIO_RESUMO_VENDAS)
     public Map<String, Object> resumoVendas(LocalDate dataInicio, LocalDate dataFim) {
         List<Object[]> linhas =
                 isSemPeriodo(dataInicio, dataFim)

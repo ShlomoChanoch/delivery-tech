@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.service.impl;
 
+import com.deliverytech.delivery_api.config.CacheConfig;
 import com.deliverytech.delivery_api.model.Produto;
 import com.deliverytech.delivery_api.repository.ProdutoRepository;
 import com.deliverytech.delivery_api.service.ProdutoService;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     private final ProdutoRepository produtoRepository;
 
     @Override
+    @CacheEvict(cacheNames = CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS, allEntries = true)
     public Produto cadastrar(Produto produto) {
         // MELHORADO: Validar preço antes de cadastrar
         validarPreco(produto.getPreco());
@@ -43,6 +46,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS, allEntries = true)
     public Produto atualizar(Long id, Produto atualizado) {
         return produtoRepository
                 .findById(id)
@@ -69,6 +73,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS, allEntries = true)
     public void deletar(Long id) {
         if (!produtoRepository.existsById(id)) {
             throw new RuntimeException("Produto não encontrado - ID: " + id);
@@ -78,6 +83,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS, allEntries = true)
     public void inativar(Long id) {
         produtoRepository
                 .findById(id)
@@ -108,6 +114,7 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheConfig.RELATORIO_PRODUTOS_MAIS_VENDIDOS, allEntries = true)
     public void alterarDisponibilidade(Long id, boolean disponivel) {
         produtoRepository
                 .findById(id)

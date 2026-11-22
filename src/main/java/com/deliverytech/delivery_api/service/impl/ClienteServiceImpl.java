@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.service.impl;
 
+import com.deliverytech.delivery_api.config.CacheConfig;
 import com.deliverytech.delivery_api.dto.request.ClienteRequest;
 import com.deliverytech.delivery_api.model.Cliente;
 import com.deliverytech.delivery_api.repository.ClienteRepository;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,12 @@ public class ClienteServiceImpl implements ClienteService {
 
     /** Cadastrar novo cliente com validações completas */
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Cliente cadastrar(ClienteRequest clienteRequest) {
         log.info("Iniciando cadastro de cliente: {}", clienteRequest.getEmail());
 
@@ -84,6 +92,12 @@ public class ClienteServiceImpl implements ClienteService {
 
     /** Atualizar dados do cliente COM TODAS AS VALIDAÇÕES */
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Cliente atualizar(
             Long id, ClienteRequest clienteRequest) { // CORRIGIR: Cliente → ClienteRequest
         log.info("Atualizando cliente ID: {}", id);
@@ -125,6 +139,12 @@ public class ClienteServiceImpl implements ClienteService {
 
     /** Inativar cliente (soft delete) COM VALIDAÇÃO */
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public void inativar(Long id) {
         log.info("Inativando cliente ID: {}", id);
 
@@ -154,6 +174,12 @@ public class ClienteServiceImpl implements ClienteService {
      * atividade
      */
     @Override
+    @CacheEvict(
+            cacheNames = {
+                CacheConfig.RELATORIO_CLIENTES_ATIVOS,
+                CacheConfig.RELATORIO_RESUMO_VENDAS
+            },
+            allEntries = true)
     public Cliente ativarDesativarCliente(Long id) {
         log.info("Alterando status do cliente ID: {}", id);
 

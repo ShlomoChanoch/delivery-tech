@@ -1,5 +1,6 @@
 package com.deliverytech.delivery_api.config;
 
+import com.deliverytech.delivery_api.security.AuthRateLimitFilter;
 import com.deliverytech.delivery_api.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthRateLimitFilter authRateLimitFilter;
     private final JwtAuthenticationFilter jwtFilter;
 
     @Bean
@@ -46,7 +48,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authRateLimitFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
