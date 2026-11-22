@@ -1,18 +1,21 @@
 package com.deliverytech.delivery_api.security;
 
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -26,15 +29,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         var token = this.recoverToken(request);
         if (token != null) {
-            var login = jwtUtil.getEmailFromToken(token);
-            UserDetails user = usuarioRepository.findByEmail(login);
+            try {
+                var login = jwtUtil.getEmailFromToken(token);
+                UserDetails user = usuarioRepository.findByEmail(login);
 
-            // Token válido de usuário deletado: segue sem autenticação (o Security barra com
-            // 401/403) em vez de NPE no filtro, que virava 500 em qualquer rota.
-            if (user != null) {
-                var authentication =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Token válido de usuário deletado: segue sem autenticação (o Security barra com
+                // 401/403) em vez de NPE no filtro, que virava 500 em qualquer rota.
+                if (user != null) {
+                    var authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (JwtException | IllegalArgumentException ex) {
+                log.warn("Token JWT inválido ou expirado: {}", ex.getMessage());
             }
         }
         filterChain.doFilter(request, response);

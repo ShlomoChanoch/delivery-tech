@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.deliverytech.delivery_api.model.Role;
 import com.deliverytech.delivery_api.model.Usuario;
 import com.deliverytech.delivery_api.repository.UsuarioRepository;
+import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -94,6 +95,20 @@ class JwtAuthenticationFilterTest {
         request.addHeader("Authorization", "Bearer token-valido");
         when(jwtUtil.getEmailFromToken("token-valido")).thenReturn("deletado@email.com");
         when(usuarioRepository.findByEmail("deletado@email.com")).thenReturn(null);
+
+        filter.doFilter(request, response, chain);
+
+        assertNotNull(chain.getRequest());
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    @DisplayName("Token malformado ou expirado: não lança exceção e segue sem autenticação")
+    void tokenInvalido_NaoAutenticaESegueCadeia() throws Exception {
+        request.addHeader("Authorization", "Bearer token.invalido");
+        when(jwtUtil.getEmailFromToken("token.invalido"))
+                .thenThrow(new MalformedJwtException("JWT inválido"));
 
         filter.doFilter(request, response, chain);
 
