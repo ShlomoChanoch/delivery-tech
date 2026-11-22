@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /** Tratamento global de exceções para toda a aplicação */
 @Slf4j
@@ -21,6 +22,7 @@ public class GlobalExceptionHandler {
     private static final String STATUS = "status";
     private static final String ERROR = "error";
     private static final String MESSAGE = "message";
+    private static final String RECURSO_NAO_ENCONTRADO = "Recurso não encontrado";
 
     /** Tratamento para validações de Bean Validation (@NotBlank, @Email, etc.) */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -58,25 +60,48 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    /** Tratamento para rotas e recursos estáticos inexistentes (Spring MVC 6.1+) */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoResourceFoundException(
+            NoResourceFoundException ex) {
+
+        log.warn("Recurso estático/rota não encontrado: {}", ex.getMessage());
+        return buildNotFoundResponse(ex.getMessage());
+    }
+
+    /** Tratamento para entidades de domínio não encontradas */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleEntityNotFoundException(
+            EntityNotFoundException ex) {
+
+        log.warn("Entidade não encontrada: {}", ex.getMessage());
+        return buildNotFoundResponse(ex.getMessage());
+    }
+
     /** Tratamento para recursos não encontrados */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
 
+        String message = ex.getMessage();
         // Se for "não encontrado", retornar 404
-        if (ex.getMessage().contains("não encontrado") || ex.getMessage().contains("not found")) {
+        if (message != null
+                && (message.contains("não encontrado") || message.contains("not found"))) {
 
-            Map<String, Object> error = new HashMap<>();
-            error.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
-            error.put(STATUS, HttpStatus.NOT_FOUND.value());
-            error.put(ERROR, "Recurso não encontrado");
-            error.put(MESSAGE, ex.getMessage());
-
-            log.warn("Recurso não encontrado: {}", ex.getMessage());
-            return ResponseEntity.notFound().build();
+            log.warn("Recurso não encontrado: {}", message);
+            return buildNotFoundResponse(message);
         }
 
         // Outros RuntimeExceptions
         return handleGenericException(ex);
+    }
+
+    private ResponseEntity<Map<String, Object>> buildNotFoundResponse(String message) {
+        Map<String, Object> error = new HashMap<>();
+        error.put(TIMESTAMP, LocalDateTime.now(ZoneId.systemDefault()));
+        error.put(STATUS, HttpStatus.NOT_FOUND.value());
+        error.put(ERROR, RECURSO_NAO_ENCONTRADO);
+        error.put(MESSAGE, message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /** Tratamento para violações de constraint */

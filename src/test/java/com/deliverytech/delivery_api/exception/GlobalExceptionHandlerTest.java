@@ -13,10 +13,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -72,7 +74,46 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("RuntimeException com 'não encontrado' deve retornar 404")
+    @DisplayName("NoResourceFoundException deve retornar 404 com envelope padrão")
+    void testHandleNoResourceFoundException_DeveRetornar404ComEnvelope() {
+        // Given
+        NoResourceFoundException ex =
+                new NoResourceFoundException(HttpMethod.GET, "painel/nao-existe");
+
+        // When
+        ResponseEntity<Map<String, Object>> response = handler.handleNoResourceFoundException(ex);
+
+        // Then
+        assertEquals(404, response.getStatusCode().value());
+        Map<String, Object> body = response.getBody();
+        assertNotNull(body);
+        assertInstanceOf(LocalDateTime.class, body.get("timestamp"));
+        assertEquals(404, body.get("status"));
+        assertEquals("Recurso não encontrado", body.get("error"));
+        assertEquals(ex.getMessage(), body.get("message"));
+    }
+
+    @Test
+    @DisplayName("EntityNotFoundException deve retornar 404 com envelope padrão")
+    void testHandleEntityNotFoundException_DeveRetornar404ComEnvelope() {
+        // Given
+        EntityNotFoundException ex = new EntityNotFoundException("Cliente", 99L);
+
+        // When
+        ResponseEntity<Map<String, Object>> response = handler.handleEntityNotFoundException(ex);
+
+        // Then
+        assertEquals(404, response.getStatusCode().value());
+        Map<String, Object> body = response.getBody();
+        assertNotNull(body);
+        assertInstanceOf(LocalDateTime.class, body.get("timestamp"));
+        assertEquals(404, body.get("status"));
+        assertEquals("Recurso não encontrado", body.get("error"));
+        assertEquals("Cliente com ID 99 não encontrado", body.get("message"));
+    }
+
+    @Test
+    @DisplayName("RuntimeException com 'não encontrado' deve retornar 404 com envelope padrão")
     void testHandleRuntimeException_NaoEncontrado_DeveRetornar404() {
         // When
         ResponseEntity<Map<String, Object>> response =
@@ -80,10 +121,15 @@ class GlobalExceptionHandlerTest {
 
         // Then
         assertEquals(404, response.getStatusCode().value());
+        Map<String, Object> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(404, body.get("status"));
+        assertEquals("Recurso não encontrado", body.get("error"));
+        assertEquals("Cliente não encontrado", body.get("message"));
     }
 
     @Test
-    @DisplayName("RuntimeException com 'not found' deve retornar 404")
+    @DisplayName("RuntimeException com 'not found' deve retornar 404 com envelope padrão")
     void testHandleRuntimeException_NotFound_DeveRetornar404() {
         // When
         ResponseEntity<Map<String, Object>> response =
@@ -91,6 +137,27 @@ class GlobalExceptionHandlerTest {
 
         // Then
         assertEquals(404, response.getStatusCode().value());
+        Map<String, Object> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(404, body.get("status"));
+        assertEquals("Recurso não encontrado", body.get("error"));
+        assertEquals("Resource not found", body.get("message"));
+    }
+
+    @Test
+    @DisplayName("RuntimeException com mensagem nula deve retornar 500 sem lançar NPE")
+    void testHandleRuntimeException_MensagemNula_DeveRetornar500SemNpe() {
+        // When
+        ResponseEntity<Map<String, Object>> response =
+                handler.handleRuntimeException(new RuntimeException());
+
+        // Then
+        assertEquals(500, response.getStatusCode().value());
+        Map<String, Object> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(500, body.get("status"));
+        assertEquals("Erro interno do servidor", body.get("error"));
+        assertEquals("Ocorreu um erro inesperado", body.get("message"));
     }
 
     @Test
