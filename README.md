@@ -1,6 +1,6 @@
 # 🚀 Delivery API
 
-API backend desenvolvida em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
+API backend originalmente desenvolvida por [Anderson Buenos](https://github.com/andersonbuenos) e forkada por mim, rodando em **Java 21** com **Spring Boot 3.5.14**, como base para um sistema de delivery moderno, escalável e de fácil manutenção — agora com **painel web público** (Thymeleaf) sobre os mesmos services.
 
 > **Status atual:** ✅ `make test` verde (172 testes, 0 falhas) · `make lint` verde · `make scan` com `.trivyignore` documentado · ✅ painel `/painel` com 5 páginas + estado de erro validado por Playwright (0 erros de console) · ✅ MySQL 8.4 + cache Caffeine + rate limiting em `/api/auth/**` · ✅ SonarQube Quality Gate OK (72,8% de cobertura geral) · 🔐 `jwt.secret` via variável de ambiente `JWT_SECRET` (nunca hardcoded).
 
